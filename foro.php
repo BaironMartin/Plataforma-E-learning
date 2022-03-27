@@ -47,7 +47,7 @@ if (isset($_REQUEST['e'])) {
     <link rel="stylesheet" tipe="text/class" href="css/">
     <link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
     <title>Plataforma E-LEARNING Foro de Discusión</title>
-    <link rel="icon" href="/img/ico/free bsd.ico">
+    <link rel="icon" href="img/ico/free bsd.ico">
 </head>
 
 <body>

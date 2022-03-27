@@ -66,7 +66,7 @@ if (isset($_REQUEST['user']) && !empty($_REQUEST['user'])) {
     <link rel="stylesheet" tipe="text/class" href="css/normalize.css">
     <link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
     <title>Plataforma E-LEARNING login and register</title>
-    <link rel="icon" href="/img/ico/free bsd.ico">
+    <link rel="icon" href="img/ico/free bsd.ico">
 </head>
 
 <body>

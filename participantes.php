@@ -36,7 +36,7 @@ $alumnos = mysqli_fetch_assoc($resultado);
     <link rel="stylesheet" tipe="text/class" href="css/">
     <link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
     <title>Plataforma E-LEARNING Participantes</title>
-    <link rel="icon" href="/img/ico/free bsd.ico">
+    <link rel="icon" href="img/ico/free bsd.ico">
 </head>
 
 <body>
@@ -62,19 +62,22 @@ $alumnos = mysqli_fetch_assoc($resultado);
                     <th>Tipo</th>
                     <th>foto</th>
                     <th>Nombre</th>
+                    <th>Email</th>
                 </tr>
             </thead>
 
             <?php
             echo "<tr><td>" . $docente['Tipo'] . "</td> ";
             echo "<td><img src ='archivos/" . $docente['Email'] . "" . $docente['Foto'] . "' class='imgg'></td>";
-            echo "<td>" . $docente['Nombre'] . "</td></tr>";
+            echo "<td>" . $docente['Nombre'] . "</td>";
+            echo "<td>" . $docente['Email'] . "</td></tr>";
 
             if ($n > 0) {
                 do {
                     echo "<tr><td>" . $alumnos['Tipo'] . "</td> ";
                     echo "<td><img src ='archivos/" . $alumnos['Email'] . "" . $alumnos['Foto'] . "' class='imgg'></td>";
-                    echo "<td>" . $alumnos['Nombre'] . "</td></tr>";
+                    echo "<td>" . $alumnos['Nombre'] . "</td>";
+                    echo "<td>" . $alumnos['Email'] . "</td></tr>";
                 } while ($alumnos = mysqli_fetch_assoc($resultado));
             } else {
                 echo "<tr><td>No hay Alumnos Inscritos</td></tr>";

@@ -75,7 +75,7 @@ $as = mysqli_fetch_assoc($resultad);
     <link rel="stylesheet" tipe="text/class" href="css/normalize.css?v=<?php echo (rand()); ?>">
     <link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
     <title>Plataforma E-LEARNING Plan de Estudio</title>
-    <link rel="icon" href="/img/ico/free bsd.ico">
+    <link rel="icon" href="img/ico/free bsd.ico">
     <script type="text/javascript" src="js/observacionesbasicas/ckeditor/ckeditor.js"></script>
     
 </head>

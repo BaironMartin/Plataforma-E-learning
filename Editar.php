@@ -70,7 +70,7 @@ $decr_pw = hash("sha512", $a['Clave']);
     <link rel="stylesheet" tipe="text/class" href="css/">
     <link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
     <title>Plataforma E-LEARNING Editar Usuario</title>
-    <link rel="icon" href="/img/ico/free bsd.ico">
+    <link rel="icon" href="img/ico/free bsd.ico">
 </head>
 
 <body>
