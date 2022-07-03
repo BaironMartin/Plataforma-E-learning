@@ -3,7 +3,7 @@ include('includes/conectar.php');
 
 session_start();
 if (isset($_SESSION['user'])) {
-    header("Location: index.php");
+    header("Location: inicio.php");
 }
 
 if (isset($_REQUEST['u']) && !empty($_REQUEST['u'])) {

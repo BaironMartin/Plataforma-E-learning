@@ -4,6 +4,10 @@ session_start();
 if (!isset($_SESSION['user'])) {
     header("location:index.php");
 }
+if (!isset($_SESSION['clave'])) {
+    header("Location: 404.php");
+}
+
 
 if (isset($_REQUEST['cerrar'])) {
     session_destroy();

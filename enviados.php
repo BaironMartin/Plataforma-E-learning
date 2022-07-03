@@ -4,6 +4,9 @@ session_start();
 if (!isset($_SESSION['user'])) {
   header("location:index.php");
 }
+if (!isset($_SESSION['clave'])) {
+  header("Location: 404.php");
+}
 
 if (isset($_REQUEST['cerrar'])) {
   session_destroy();
@@ -74,25 +77,17 @@ $tot = mysqli_num_rows($res);
       <tr>
         <th ><strong>ID</strong></th>
         <th ><strong>Asunto</strong></th>
-        <th ><strong>De</strong></th>
+        <th ><strong>Para</strong></th>
         <th ><strong>Fecha</strong></th>
       </tr>
       </thead>
       <?php
       $i = 0;
-      while ($row = mysqli_fetch_assoc($res)) { ?>
-        <tr bgcolor="<?php if ($row['leido'] == "si") {
-                        echo "#FFE8E8";
-                      } else {
-                        if ($i % 2 == 0) {
-                          echo "#FFE7CE";
-                        } else {
-                          echo "#FFCAB0";
-                        }
-                      } ?>">
+      while ($row = mysqli_fetch_array($res)) { ?>
+        <tr>
           <td ><?php echo $row['ID'] ?></td>
           <td ><a href="leer copy.php?id=<?php echo $row['ID'] ?>"><?php echo $row['asunto'] ?></a></td>
-          <td ><?php echo $row['de'] ?></td>
+          <td ><?php echo $row['para'] ?></td>
           <td ><?php echo $row['fecha'] ?></td>
         </tr>
       <?php $i++;

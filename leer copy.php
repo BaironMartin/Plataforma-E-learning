@@ -4,6 +4,9 @@ session_start();
 if (!isset($_SESSION['user'])) {
 	header("location:index.php");
 }
+if (!isset($_SESSION['clave'])) {
+    header("Location: 404.php");
+}
 
 if (isset($_REQUEST['cerrar'])) {
 	session_destroy();
@@ -71,7 +74,7 @@ $row = mysqli_fetch_assoc($res);
 		</header>
 		<br>
 		<div class='contenedor_interno'>
-			<strong>De:</strong> <?php echo $row['de'] ?><br />
+			<strong>Para:</strong> <?php echo $row['para'] ?><br />
 			<strong>Fecha:</strong> <?php echo $row['fecha'] ?><br />
 			<strong>Asunto:</strong> <?php echo $row['asunto'] ?><br /><br />
 			<strong>Mensaje:</strong><br />
