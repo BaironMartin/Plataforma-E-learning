@@ -9,6 +9,9 @@ if (isset($_REQUEST['cerrar'])) {
     session_destroy();
     header("location:index.php");
 }
+if (!isset($_SESSION['clave'])) {
+    header("Location: 404.php");
+}
 
 $qtareas = mysqli_query($cont, "SELECT * FROM plan WHERE clave ='" . $_SESSION['clave']."' ORDER BY  fecha ASC ");
 $ntares = mysqli_num_rows($qtareas);

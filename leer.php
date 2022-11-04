@@ -4,6 +4,9 @@ session_start();
 if (!isset($_SESSION['user'])) {
 	header("location:index.php");
 }
+if (!isset($_SESSION['clave'])) {
+    header("Location: 404.php");
+}
 
 if (isset($_REQUEST['cerrar'])) {
 	session_destroy();
@@ -53,7 +56,7 @@ $row = mysqli_fetch_assoc($res);
 	?>
 	<hr>
 
-	<h1 style="margin-bottom: -50px;">Calificaciones</h1>
+	<h1 style="margin-bottom: -50px;">Correo Interno</h1>
 	<div class="menu">
 		<h1><?php include('includes/menu.php') ?></h1>
 	</div>

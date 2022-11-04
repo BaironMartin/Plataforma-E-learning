@@ -4,6 +4,9 @@ session_start();
 if (!isset($_SESSION['user'])) {
 	header("location:index.php");
 }
+if (!isset($_SESSION['clave'])) {
+    header("Location: 404.php");
+}
 
 if (isset($_REQUEST['cerrar'])) {
 	session_destroy();
@@ -53,7 +56,7 @@ $row = mysqli_fetch_assoc($res);
 	?>
 	<hr>
 
-	<h1 style="margin-bottom: -50px;">Calificaciones</h1>
+	<h1 style="margin-bottom: -50px;">Correo Interno</h1>
 	<div class="menu">
 		<h1><?php include('includes/menu.php') ?></h1>
 	</div>
@@ -71,19 +74,14 @@ $row = mysqli_fetch_assoc($res);
 		</header>
 		<br>
 		<div class='contenedor_interno'>
-			<strong>De:</strong> <?php echo $row['de'] ?><br />
+			<strong>Para:</strong> <?php echo $row['para'] ?><br />
 			<strong>Fecha:</strong> <?php echo $row['fecha'] ?><br />
 			<strong>Asunto:</strong> <?php echo $row['asunto'] ?><br /><br />
 			<strong>Mensaje:</strong><br />
 			<?php echo $row['texto'] ?>
 		</div>
 
-		<?php
-
-		if ($row['leido'] != "si") {
-			mysqli_query($cont, "UPDATE mensaje SET leido='si' WHERE ID='" . $id . "'");
-		}
-		?>
+		
 	</div>
 
 </body>

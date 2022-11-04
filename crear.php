@@ -4,14 +4,15 @@ session_start();
 if (!isset($_SESSION['user'])) {
 	header("location:index.php");
 }
+if (!isset($_SESSION['clave'])) {
+	header("Location: 404.php");
+}
 
 if (isset($_REQUEST['cerrar'])) {
 	session_destroy();
 	header("location:index.php");
 }
-$sql = "SELECT * FROM usuarios WHERE Email ='" . $_SESSION['user'] . "'";
-$resultado = mysqli_query($cont, $sql);
-$a = mysqli_fetch_assoc($resultado);
+
 
 
 $sql = ("SELECT* FROM clase WHERE clave='" . $_SESSION['clave'] . "'");
@@ -19,9 +20,19 @@ $resultado1 = mysqli_query($cont, $sql);
 $n1 = mysqli_num_rows($resultado1);
 $a1 = mysqli_fetch_assoc($resultado1);
 
-$sql = "SELECT * FROM mensaje WHERE para='" . $_SESSION['user'] . "' and leido IS NULL";
-$res = mysqli_query($cont, $sql);
-$tot = mysqli_num_rows($res);
+$sql = ("SELECT* FROM misclases, usuarios WHERE misclases.usuario=usuarios.Email AND misclases.clave='" . $_SESSION['clave'] . "'");
+$resultado = mysqli_query($cont, $sql);
+$n = mysqli_num_rows($resultado);
+$alumnos = mysqli_fetch_assoc($resultado);
+
+$sql = ("SELECT* FROM clase, usuarios WHERE clase.usuario=usuarios.Email AND clase.clave='" . $_SESSION['clave'] . "'");
+$resultado2 = mysqli_query($cont, $sql);
+$docente = mysqli_fetch_assoc($resultado2);
+
+$sql = "SELECT * FROM usuarios WHERE Email ='" . $_SESSION['user'] . "'";
+$resultad = mysqli_query($cont, $sql);
+$as = mysqli_fetch_assoc($resultad);
+
 
 
 if (isset($_REQUEST['para'])) {
@@ -65,7 +76,7 @@ if (isset($_REQUEST['para'])) {
 	?>
 	<hr>
 
-	<h1 style="margin-bottom: -50px;">Calificaciones</h1>
+	<h1 style="margin-bottom: -50px;">Correo Interno</h1>
 	<div class="menu">
 		<h1><?php include('includes/menu.php') ?></h1>
 	</div>
@@ -85,7 +96,31 @@ if (isset($_REQUEST['para'])) {
 
 
 		<form action="crear.php" method="post" autocomplete="off" class="formu" style="margin-top: -50px;">
-			<input class="formu-input" type="text" name="para" placeholder="Para" required><br><br>
+			<select class="formu-input" name="para" required>
+
+				<option value="">Seleccione el Destinatario</option>
+				<?php
+				$emaild = $docente['Email'];
+				$nombred = $docente['Nombre'];
+				if ($emaild != $_SESSION['user']) {
+				?>
+					echo "<option value="<?php echo $emaild ?>"><?php echo $nombred ?></option> ";
+					<?php
+				}
+				do {
+					$email = $alumnos['Email'];
+					$nombre = $alumnos['Nombre'];
+					if ($email != $_SESSION['user']) {
+					?>
+						echo "<option value="<?php echo $email ?>"><?php echo $nombre ?></option> ";
+				<?php					}
+				} while ($alumnos = mysqli_fetch_assoc($resultado));
+				?>
+
+
+
+
+			</select name="para"><br><br>
 			<input class="formu-input" type="text" name="asunto" placeholder="Asunto" required> <br><br>
 			<textarea id="ckeditor" class="formu-input ckeditor" name="texto" placeholder="Agregar Nuevo Comentario" cols="30" rows="10" required></textarea>
 			<input class="formu-button" type="submit" name="enviar" value="Enviar">

@@ -9,13 +9,6 @@ if (isset($_REQUEST['cerrar'])) {
     session_destroy();
     header("location:index.php");
 }
-$varsession = $_SESSION['user'];
-
-if ($varsession == null || $varsession == '') {
-    echo 'acceso denegado';
-    die();
-}
-
 
 $sql = "SELECT * FROM usuarios WHERE Email ='" . $_SESSION['user'] . "'";
 $resultado = mysqli_query($cont, $sql);
@@ -66,7 +59,8 @@ $a = mysqli_fetch_assoc($resultado);
             if($a['Tipo']=='Docente'){
                 echo "<br><a class='crear'  href='crearClase.php'> Gestionar Clases</a>"; 
             }
-            else{
+
+            if($a['Tipo']!='Docente')  {
                 echo "<br><a class='crear'  href='unirse.php'> Gestionar Clases</a>"; 
             
             }

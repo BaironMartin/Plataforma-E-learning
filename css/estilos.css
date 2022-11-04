@@ -120,6 +120,7 @@ h1 {
   outline: none;
 }
 
+
 .contenedor_login_register form button {
   padding: 10px 40px;
   margin-top: 40px;
@@ -291,7 +292,7 @@ h1 {
 
 .formu-input {
   background-color: rgba(6, 63, 116, 0.5);
-  color: #fff;
+  color: rgb(255, 255, 255.,7);
   font-size: 15px;
   width: 100%;
   padding: 7px !important;
@@ -305,7 +306,6 @@ h1 {
 .formu-input:focus {
   background: linear-gradient(to bottom, transparent, #222);
   outline: none;
-  color: #fff;
   border-bottom: 3px solid rgb(10, 158, 222);
 }
 .formu-input::placeholder {
@@ -325,7 +325,7 @@ h1 {
   color: #fff;
   border: 2px solid white;
   padding: 12px;
-  width: 100%;
+  width: 80%;
   margin: 10px;
   text-transform: uppercase;
   font-size: 18px;
@@ -640,3 +640,32 @@ text-transform: uppercase;
   }
 }
 
+.cont_404{
+  display: flex;
+  justify-content: center;
+  flex-wrap: nowrap;
+  align-items: center;
+  align-content: stretch;
+  flex-direction: column;
+
+}
+.col_side{
+  max-width: 600px;
+  margin: 15px;
+  
+}
+
+.col_side img{
+  border-radius: 10px;
+  height: 600px;
+  width: auto;
+}
+.col_side p{
+ font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+ font-size: 2rem;
+ text-align: center;
+ flex-basis: 50%;
+ margin-bottom: 50%;
+ color: aliceblue;
+ text-transform: uppercase;
+ }
