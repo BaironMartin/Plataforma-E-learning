@@ -106,7 +106,3 @@ $tot = mysqli_num_rows($res);
 </body>
 
 </html>
-<?php
-
-
-?>

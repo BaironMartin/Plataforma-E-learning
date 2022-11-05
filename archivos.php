@@ -146,5 +146,4 @@ $atipo = mysqli_fetch_assoc(mysqli_query($cont, "SELECT * FROM usuarios WHERE Em
 
 
 </body>
-
 </html>

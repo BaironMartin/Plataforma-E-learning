@@ -1,4 +1,4 @@
-<?php
+<<?php
 include('includes/conectar.php');
 session_start();
 if (!isset($_SESSION['user'])) {

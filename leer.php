@@ -92,7 +92,3 @@ $row = mysqli_fetch_assoc($res);
 </body>
 
 </html>
-<?php
-
-
-?>

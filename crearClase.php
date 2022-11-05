@@ -34,7 +34,7 @@ if (isset($_REQUEST['clase'])) {
 }
 
 if (isset($_REQUEST['e'])) {
-    $sql2 = ("DELETE FROM clase WHERE idclase='" . $_REQUEST['e']);
+    $sql2 = ("DELETE FROM clase WHERE idclase=" . $_REQUEST['e']);
     mysqli_query($cont, $sql2);
 }
 
@@ -108,5 +108,4 @@ $a = mysqli_fetch_assoc($resultado);
 
 
 </body>
-
 </html>
