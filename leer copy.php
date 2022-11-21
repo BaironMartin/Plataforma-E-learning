@@ -28,21 +28,8 @@ $id = $_GET['id'];
 $sql = "SELECT * FROM mensaje WHERE de='" . $_SESSION['user'] . "' and ID='" . $id . "'";
 $res = mysqli_query($cont, $sql);
 $row = mysqli_fetch_assoc($res);
-
+include('includes/encabezado.php')
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" tipe="text/class" href="css/">
-	<link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
-	<title>Plataforma E-LEARNING Email</title>
-	<link rel="icon" href="img/ico/free bsd.ico">
-</head>
 
 <body>
 	<?php
@@ -56,7 +43,7 @@ $row = mysqli_fetch_assoc($res);
 	?>
 	<hr>
 
-	<h1 style="margin-bottom: -50px;">Calificaciones</h1>
+	<h1 style="margin-bottom: -50px;">Correo Interno</h1>
 	<div class="menu">
 		<h1><?php include('includes/menu.php') ?></h1>
 	</div>
@@ -77,7 +64,7 @@ $row = mysqli_fetch_assoc($res);
 			<strong>Para:</strong> <?php echo $row['para'] ?><br />
 			<strong>Fecha:</strong> <?php echo $row['fecha'] ?><br />
 			<strong>Asunto:</strong> <?php echo $row['asunto'] ?><br /><br />
-			<strong>Mensaje:</strong><br />
+			<strong>Mensaje:</strong><br/><br/>
 			<?php echo $row['texto'] ?>
 		</div>
 
@@ -87,3 +74,12 @@ $row = mysqli_fetch_assoc($res);
 </body>
 
 </html>
+<?php
+
+
+mysqli_free_result($resultado1);
+mysqli_free_result($resultado);
+mysqli_free_result($res);
+mysqli_close($cont);
+
+?>

@@ -10,9 +10,7 @@ if (isset($_REQUEST['cerrar'])) {
     header("location:index.php");
 }
 
-//$sql = ("SELECT * FROM usuarios WHERE Email='" . $_SESSION['user'] . "'");
-//$user = mysqli_query($cont, $sql);
-//$a = mysqli_fetch_assoc($user);
+
 
 if (isset($_REQUEST['clave'])) {
     $sql2 = ("SELECT * FROM clase WHERE clave='" . $_REQUEST['clave'] . "'");
@@ -34,11 +32,13 @@ if (isset($_REQUEST['clave'])) {
         window.location.href="unirse.php";
         </script>';
         }
+        mysqli_free_result($resultado2);
     } else {
         echo '<script type="text/javascript">alert("La clase no Existe");
         window.location.href="unirse.php";
         </script>';
     }
+    mysqli_free_result($resultado1);
 }
 $sql = ("SELECT clase.nombre, misclases.idmiclase, clase.clave FROM clase,misclases WHERE clase.clave = misclases.clave and misclases.usuario= '" . $_SESSION['user'] . "'");
 $resultado = mysqli_query($cont, $sql);
@@ -50,24 +50,14 @@ if (isset($_REQUEST['e'])) {
     $sql2 = ("DELETE FROM misclases WHERE idmiclase=" . $_REQUEST['e']);
     mysqli_query($cont, $sql2);
 }
+include('includes/encabezado.php')
 ?>
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" tipe="text/class" href="css/">
-    <link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
-    <title>Plataforma E-LEARNING Gestionar Clase</title>
-    <link rel="icon" href="img/ico/free bsd.ico">
-</head>
 
 <body>
 
     <div class="pegajoso">
-        <h2 class="titulo1">PREPARATORIA RANCHO HUMILDE</h2>
+        <h2 class="titulo1"><?php include('includes/name.php')?></h2>
         <div class="container2">
             <a class=" editar" href="inicio.php">Inicio</a>
             <a class=" cerrar" href="inicio.php?cerrar=1">Cerrar Secion</a>
@@ -117,3 +107,11 @@ if (isset($_REQUEST['e'])) {
 </body>
 
 </html>
+<?php
+
+
+
+mysqli_free_result($resultado);
+mysqli_close($cont);
+
+?>

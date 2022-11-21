@@ -47,22 +47,9 @@ if (isset($_REQUEST['e'])) {
     mysqli_query($cont, "DELETE FROM comentario WHERE  idcomentario=" . $_REQUEST['e']);
     header("location:comentar.php");
 }
+include('includes/encabezado.php')
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" tipe="text/class" href="css/">
-    <link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
-    <title>Plataforma E-LEARNING Foro de Discusión</title>
-    <link rel="icon" href="img/ico/free bsd.ico">
-    <script type="text/javascript" src="js/ckeditor/ckeditor.js"></script>
-    
-</head>
 
 <body>
 <div class="pegajoso">
@@ -132,3 +119,12 @@ if (isset($_REQUEST['e'])) {
 
 
 </html>
+
+<?php
+
+mysqli_free_result($qtema);
+mysqli_free_result($resultado1);
+mysqli_free_result($qcomentario);
+mysqli_close($cont);
+
+?>

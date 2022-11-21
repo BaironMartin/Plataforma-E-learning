@@ -60,7 +60,7 @@ if (isset($_REQUEST['texto']) && !empty($_REQUEST['texto'])) {
         move_uploaded_file($_FILES['archivo']['tmp_name'], "archivosTareas/" . $idtar . $namefile);
         header("location:entregatarea.php");
     }
-
+    mysqli_free_result($resultado);
    
 }
 
@@ -82,26 +82,12 @@ if (isset($_REQUEST['e'])) {
     
 }
 
-
+include('includes/encabezado.php')
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" tipe="text/class" href="css/">
-    <link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
-    <title>Plataforma E-LEARNING Entrega Tareas</title>
-    <link rel="icon" href="img/ico/free bsd.ico">
-    <script type="text/javascript" src="js/observacionesbasicas/ckeditor/ckeditor.js"></script>
-</head>
 
 <body>
     <div class="pegajoso">
-        <h2 class="titulo1">PREPARATORIA RANCHO HUMILDE</h2>
+        <h2 class="titulo1"><?php include('includes/name.php')?></h2>
         <div class="container2">
             <a class=" editar" href="tareas.php">Volver</a>
             <a class=" cerrar" href="inicio.php?cerrar=1">Cerrar Secion</a>
@@ -284,3 +270,12 @@ if (isset($_REQUEST['e'])) {
 
 </body>
 </html>
+<?php
+
+mysqli_free_result($tarea1);
+mysqli_free_result($resultado1);
+
+mysqli_free_result($tarea);
+mysqli_close($cont);
+
+?>

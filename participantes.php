@@ -29,20 +29,19 @@ $resultado = mysqli_query($cont, $sql);
 $n = mysqli_num_rows($resultado);
 $alumnos = mysqli_fetch_assoc($resultado);
 
+$atipo = mysqli_fetch_assoc(mysqli_query($cont, "SELECT * FROM usuarios WHERE Email ='" . $_SESSION['user'] . "'"));
+
+if (isset($_REQUEST['e'])) {
+    echo $_REQUEST['e'];
+    $sql2 = ("DELETE FROM misclases WHERE idmiclase=" . $_REQUEST['e']);
+    mysqli_query($cont, $sql2);
+    header("location:participantes.php");
+}
+
+include('includes/encabezado.php')
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" tipe="text/class" href="css/">
-    <link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
-    <title>Plataforma E-LEARNING Participantes</title>
-    <link rel="icon" href="img/ico/free bsd.ico">
-</head>
 
 <body>
     <?php
@@ -68,6 +67,9 @@ $alumnos = mysqli_fetch_assoc($resultado);
                     <th>foto</th>
                     <th>Nombre</th>
                     <th>Email</th>
+                    <?php if ($atipo['Tipo'] == 'Docente') {
+                        echo "<th>Eliminar</th>";
+                    } ?>
                 </tr>
             </thead>
 
@@ -82,7 +84,10 @@ $alumnos = mysqli_fetch_assoc($resultado);
                     echo "<tr><td>" . $alumnos['Tipo'] . "</td> ";
                     echo "<td><img src ='archivos/" . $alumnos['Email'] . "" . $alumnos['Foto'] . "' class='imgg'></td>";
                     echo "<td>" . $alumnos['Nombre'] . "</td>";
-                    echo "<td>" . $alumnos['Email'] . "</td></tr>";
+                    echo "<td>" . $alumnos['Email'] . "</td>";
+                    if ($atipo['Tipo'] == 'Docente') {
+                        echo "<td><a href='participantes.php?e=" . $alumnos['idmiclase'] . "'>Eliminar</a></td></tr>";
+                    };
                 } while ($alumnos = mysqli_fetch_assoc($resultado));
             } else {
                 echo "<tr><td>No hay Alumnos Inscritos</td></tr>";
@@ -94,3 +99,10 @@ $alumnos = mysqli_fetch_assoc($resultado);
 
 
 </html>
+<?php
+
+mysqli_free_result($resultado1);
+mysqli_free_result($resultado);
+mysqli_close($cont);
+
+?>

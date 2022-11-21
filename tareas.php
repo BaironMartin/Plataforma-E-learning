@@ -22,20 +22,10 @@ $sql = ("SELECT* FROM clase WHERE clave='" . $_SESSION['clave'] . "'");
 $resultado1 = mysqli_query($cont, $sql);
 $n1 = mysqli_num_rows($resultado1);
 $a1 = mysqli_fetch_assoc($resultado1);
+include('includes/encabezado.php')
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" tipe="text/class" href="css/">
-    <link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
-    <title>Plataforma E-LEARNING Seguimiento y Evaluacion</title>
-    <link rel="icon" href="img/ico/free bsd.ico">
-</head>
 
 <body>
     <?php
@@ -89,3 +79,10 @@ $a1 = mysqli_fetch_assoc($resultado1);
 </body>
 
 </html>
+<?php
+
+mysqli_free_result($qtareas);
+mysqli_free_result($resultado1);
+mysqli_close($cont);
+
+?>

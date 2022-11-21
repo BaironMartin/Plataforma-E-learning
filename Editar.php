@@ -1,5 +1,5 @@
 <?php
-error_reporting(0);
+
 include('includes/conectar.php');
 session_start();
 if (!isset($_SESSION['user'])) {
@@ -58,26 +58,14 @@ if (isset($_REQUEST['pass']) && !empty($_REQUEST['pass'])) {
     mysqli_close($cont);
 }
 $decr_pw = hash("sha512", $a['Clave']);
-
+include('includes/encabezado.php')
 ?>
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" tipe="text/class" href="css/">
-    <link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
-    <title>Plataforma E-LEARNING Editar Usuario</title>
-    <link rel="icon" href="img/ico/free bsd.ico">
-</head>
 
 <body>
 
     
     <div class="pegajoso">
-        <h2 class="titulo1">PREPARATORIA RANCHO HUMILDE</h2>
+        <h2 class="titulo1"><?php include('includes/name.php')?></h2>
         <div class="container2">
             <a class=" editar"href="inicio.php">Inicio</a>
             <a class=" cerrar" href="inicio.php?cerrar=1">Cerrar Secion</a>

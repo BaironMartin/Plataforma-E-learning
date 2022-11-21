@@ -47,23 +47,10 @@ if (isset($_REQUEST['para'])) {
 	header("location:email.php");
 }
 
-
+include('includes/encabezado.php')
 
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" tipe="text/class" href="css/">
-	<link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
-	<title>Plataforma E-LEARNING Email</title>
-	<link rel="icon" href="img/ico/free bsd.ico">
-	<script type="text/javascript" src="js/ckeditor/ckeditor.js"></script>
-</head>
 
 <body>
 	<?php

@@ -8,7 +8,6 @@ if (!isset($_SESSION['clave'])) {
     header("Location: 404.php");
 }
 
-
 if (isset($_REQUEST['cerrar'])) {
     session_destroy();
     header("location:index.php");
@@ -62,20 +61,10 @@ if (isset($_REQUEST['e'])) {
     header("location:archivos.php");
 }
 $atipo = mysqli_fetch_assoc(mysqli_query($cont, "SELECT * FROM usuarios WHERE Email ='" . $_SESSION['user'] . "'"));
+
+include('includes/encabezado.php')
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" tipe="text/class" href="css/">
-    <link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
-    <title>Plataforma E-LEARNING Guia de Actividades</title>
-    <link rel="icon" href="img/ico/free bsd.ico">
-</head>
 
 <body>
     <?php
@@ -147,3 +136,11 @@ $atipo = mysqli_fetch_assoc(mysqli_query($cont, "SELECT * FROM usuarios WHERE Em
 
 </body>
 </html>
+<?php
+
+mysqli_free_result($resultad);
+mysqli_free_result($resultado1);
+mysqli_free_result($qarchivos);
+mysqli_close($cont);
+
+?>

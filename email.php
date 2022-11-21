@@ -1,4 +1,4 @@
-<<?php
+<?php
 include('includes/conectar.php');
 session_start();
 if (!isset($_SESSION['user'])) {
@@ -26,20 +26,10 @@ $sql = "SELECT * FROM mensaje WHERE para='" . $_SESSION['user'] ."' AND clave ='
 $res = mysqli_query($cont, $sql);
 $tot = mysqli_num_rows($res);
 
+include('includes/encabezado.php')
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" tipe="text/class" href="css/">
-    <link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
-    <title>Plataforma E-LEARNING Email</title>
-    <link rel="icon" href="img/ico/free bsd.ico">
-</head>
 
 <body>
     <?php
@@ -53,7 +43,7 @@ $tot = mysqli_num_rows($res);
     ?>
     <hr>
 
-    <h1 style="margin-bottom: -50px;">Calificaciones</h1>
+    <h1 style="margin-bottom: -50px;">Correo Interno</h1>
     <div class="menu">
     <h1><?php include('includes/menu.php') ?></h1>
     </div>
@@ -80,3 +70,12 @@ $tot = mysqli_num_rows($res);
 </body>
 
 </html>
+<?php
+
+
+mysqli_free_result($resultado1);
+mysqli_free_result($resultado);
+mysqli_free_result($res);
+mysqli_close($cont);
+
+?>

@@ -28,21 +28,9 @@ $id = $_GET['id'];
 $sql = "SELECT * FROM mensaje WHERE para='" . $_SESSION['user'] . "' and ID='" . $id . "'";
 $res = mysqli_query($cont, $sql);
 $row = mysqli_fetch_assoc($res);
-
+include('includes/encabezado.php')
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" tipe="text/class" href="css/">
-	<link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
-	<title>Plataforma E-LEARNING Email</title>
-	<link rel="icon" href="img/ico/free bsd.ico">
-</head>
 
 <body>
 	<?php
@@ -77,7 +65,7 @@ $row = mysqli_fetch_assoc($res);
 			<strong>De:</strong> <?php echo $row['de'] ?><br />
 			<strong>Fecha:</strong> <?php echo $row['fecha'] ?><br />
 			<strong>Asunto:</strong> <?php echo $row['asunto'] ?><br /><br />
-			<strong>Mensaje:</strong><br />
+			<p><strong>Mensaje:</strong></p><br />
 			<?php echo $row['texto'] ?>
 		</div>
 

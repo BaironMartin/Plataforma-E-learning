@@ -4,7 +4,7 @@ $resultad = mysqli_query($cont, $sql);
 $as = mysqli_fetch_assoc($resultad);
 ?>
 <div class="pegajoso">
-        <h2 class="titulo1">PREPARATORIA RANCHO HUMILDE</h2>
+        <h2 class="titulo1"><?php include('includes/name.php')?></h2>
         <div class="container2">
         <?php
             if ($as['Tipo'] == 'Docente') {

@@ -29,21 +29,13 @@ $alumnos = mysqli_fetch_assoc($resultado);
 
 $atipo = mysqli_fetch_assoc(mysqli_query($cont, "SELECT * FROM usuarios WHERE Email ='" . $_SESSION['user'] . "'"));
 
-
+include('includes/encabezado.php')
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" tipe="text/class" href="css/">
-    <link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
-    <title>Plataforma E-LEARNING Calificaciones</title>
-    <link rel="icon" href="img/ico/free bsd.ico">
-</head>
+
 
 <body>
     <?php
@@ -121,8 +113,8 @@ $atipo = mysqli_fetch_assoc(mysqli_query($cont, "SELECT * FROM usuarios WHERE Em
                             $i++;
                         } else {
                             echo "<td>Por Calificar</td></tr>";
-                            $suma+=10;
-                            $i+=1;
+                            $suma += 10;
+                            $i += 1;
                         }
 
 
@@ -134,20 +126,35 @@ $atipo = mysqli_fetch_assoc(mysqli_query($cont, "SELECT * FROM usuarios WHERE Em
                 ?>
             </table>
             <?php
-            
-                if ($ncal >0) { ?>
-                <div class='contenedor_interno'>
-                        <artricle>
-                            <?php echo "<h3> Promedio " . round($suma / $i) . "</h3>"; ?>
-                        </artricle>
-                    </div>
-                    
-            <?php
-                }
 
-        } ?>
+            if ($ncal > 0) { ?>
+                <div class='contenedor_interno'>
+                    <artricle>
+                        <?php echo "<h3> Promedio " . round($suma / $i) . "</h3>"; ?>
+                    </artricle>
+                </div>
+
+                <form action="reporteAlumnos.php" method="post" autocomplete="off" class="formu">
+                <input class="formu-button" type="submit" value="Generar Reporte PDF">
+            </form>
+
+        <?php
+            }
+            mysqli_free_result($cal);
+        } 
+?>
+
+            
     </div>
 
 </body>
 
 </html>
+<?php
+
+
+mysqli_free_result($resultado1);
+mysqli_free_result($resultado);
+mysqli_close($cont);
+
+?>

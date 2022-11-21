@@ -58,33 +58,20 @@ if (isset($_REQUEST['ma'])) {
     $sql3 = ("SELECT* FROM plan WHERE idplan=" . $_REQUEST['ma']);
     $mn = mysqli_query($cont, $sql3);
     $mplan = mysqli_fetch_assoc($mn);
+    mysqli_free_result($mn);
 }
 
 $sql = "SELECT * FROM usuarios WHERE Email ='" . $_SESSION['user'] . "'";
 $resultad = mysqli_query($cont, $sql);
 $as = mysqli_fetch_assoc($resultad);
-
+include('includes/encabezado.php')
 
 ?>
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" tipe="text/class" href="css/normalize.css?v=<?php echo (rand()); ?>">
-    <link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
-    <title>Plataforma E-LEARNING Plan de Estudio</title>
-    <link rel="icon" href="img/ico/free bsd.ico">
-    <script type="text/javascript" src="js/observacionesbasicas/ckeditor/ckeditor.js"></script>
-    
-</head>
 
 <body>
 
     <div class="pegajoso">
-        <h2 class="titulo1">PREPARATORIA RANCHO HUMILDE</h2>
+        <h2 class="titulo1"><?php include('includes/name.php')?></h2>
         <div class="container2">
 
             <?php
@@ -175,3 +162,12 @@ $as = mysqli_fetch_assoc($resultad);
 </body>
 
 </html>
+
+<?php
+
+mysqli_free_result($resultado1);
+mysqli_free_result($resultad);
+mysqli_free_result($resultado);
+mysqli_close($cont);
+
+?>

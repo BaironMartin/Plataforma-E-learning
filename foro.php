@@ -38,20 +38,8 @@ if (isset($_REQUEST['e'])) {
     mysqli_query($cont, "DELETE FROM temas WHERE  idtema=" . $_REQUEST['e']);
     header("location:foro.php");
 }
+include('includes/encabezado.php')
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" tipe="text/class" href="css/">
-    <link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
-    <title>Plataforma E-LEARNING Foro de Discusión</title>
-    <link rel="icon" href="img/ico/free bsd.ico">
-</head>
 
 <body>
     <?php
@@ -97,7 +85,7 @@ if (isset($_REQUEST['e'])) {
             </thead>
             <?php
             if ($ntema > 0) {
-                $cont =  mysqli_num_rows(mysqli_query($cont, "SELECT * FROM comentario WHERE idtema =".$atema['idtema'])); 
+                $contar =  mysqli_num_rows(mysqli_query($cont, "SELECT * FROM comentario WHERE idtema =".$atema['idtema'])); 
                 
                 $i = 1;
                 do {
@@ -105,7 +93,7 @@ if (isset($_REQUEST['e'])) {
                     echo "<td> Tema" . $i . "</td>";
                     echo "<td>" . $atema['tema'] . "</td>";
                     echo "<td>" . $atema['fecha'] . "</td>";
-                    echo "<td>" . $cont . "</td>";
+                    echo "<td>" . $contar . "</td>";
                     if ($atipo['Tipo'] == 'Docente') {
                         echo "<td><a href='foro.php?ef=" . $atema['idtema'] . "'>Eliminar</a></td>";
                     }
@@ -129,3 +117,10 @@ if (isset($_REQUEST['e'])) {
 </body>
 
 </html>
+<?php
+
+mysqli_free_result($qtema);
+mysqli_free_result($resultado1);
+mysqli_close($cont);
+
+?>

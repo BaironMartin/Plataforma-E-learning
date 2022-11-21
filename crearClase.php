@@ -36,6 +36,7 @@ if (isset($_REQUEST['clase'])) {
 if (isset($_REQUEST['e'])) {
     $sql2 = ("DELETE FROM clase WHERE idclase=" . $_REQUEST['e']);
     mysqli_query($cont, $sql2);
+    header("location:crearClase.php");
 }
 
 $sql = ("SELECT* FROM clase WHERE usuario='" . $_SESSION['user'] . "'");
@@ -43,24 +44,15 @@ $resultado = mysqli_query($cont, $sql);
 $n = mysqli_num_rows($resultado);
 $a = mysqli_fetch_assoc($resultado);
 
-?>
-<!DOCTYPE html>
-<html lang="en">
+include('includes/encabezado.php')
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" tipe="text/class" href="css/">
-    <link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
-    <title>Plataforma E-LEARNING Gestionar Clase</title>
-    <link rel="icon" href="img/ico/free bsd.ico">
-</head>
+?>
+
 
 <body>
 
     <div class="pegajoso">
-        <h2 class="titulo1">PREPARATORIA RANCHO HUMILDE</h2>
+        <h2 class="titulo1"><?php include('includes/name.php')?></h2>
         <div class="container2">
             <a class=" editar" href="inicio.php">Inicio</a>
             <a class=" cerrar" href="inicio.php?cerrar=1">Cerrar Secion</a>
@@ -109,3 +101,7 @@ $a = mysqli_fetch_assoc($resultado);
 
 </body>
 </html>
+<?php
+mysqli_free_result($resultado);
+mysqli_close($cont);
+?>

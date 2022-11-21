@@ -53,27 +53,16 @@ if (isset($_REQUEST['user']) && !empty($_REQUEST['user'])) {
     mysqli_close($cont);
 }
 
-
+include('includes/encabezado.php')
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" tipe="text/class" href="css/normalize.css">
-    <link rel="stylesheet" tipe="text/class" href="css/estilos.css?v=<?php echo (rand()); ?>">
-    <title>Plataforma E-LEARNING login and register</title>
-    <link rel="icon" href="img/ico/free bsd.ico">
-</head>
 
 <body>
     <div class="pegajoso">
-        <img src="img/logo.jpg" alt="">
-        <h1>PREPARATORIA RANCHO HUMILDE</h1>
+        <img src="img/logo.png" alt="">
+        <h1><?php include('includes/name.php')?></h1>
     </div>
+    <br>
     <main>
         <div class="contenedor__todo">
             <div class="caja_trasera">
