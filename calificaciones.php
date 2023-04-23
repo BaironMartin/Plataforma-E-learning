@@ -1,11 +1,9 @@
 <?php
 include('includes/conectar.php');
-session_start();
-if (!isset($_SESSION['user'])) {
-    header("location:index.php");
-}
+include('includes/secionesUser.php');
+
 if (!isset($_SESSION['clave'])) {
-    header("Location: 404.php");
+    header("Location: error.php");
 }
 if (isset($_REQUEST['cerrar'])) {
     session_destroy();
@@ -13,10 +11,12 @@ if (isset($_REQUEST['cerrar'])) {
 }
 
 
+
 $sql = ("SELECT* FROM clase WHERE clave='" . $_SESSION['clave'] . "'");
 $resultado1 = mysqli_query($cont, $sql);
 $n1 = mysqli_num_rows($resultado1);
 $a1 = mysqli_fetch_assoc($resultado1);
+
 
 $sql = ("SELECT* FROM clase, usuarios WHERE clase.usuario=usuarios.Email AND clase.clave='" . $_SESSION['clave'] . "'");
 $resultado = mysqli_query($cont, $sql);
@@ -54,7 +54,7 @@ include('includes/encabezado.php')
         <h1><?php include('includes/menu.php') ?></h1>
     </div>
     <div class="tabla">
-        <?php
+         <?php
         if ($atipo['Tipo'] == 'Docente') { ?>
             <table>
                 <thead>
@@ -62,6 +62,7 @@ include('includes/encabezado.php')
                         <th>foto</th>
                         <th>Nombre</th>
                         <th>Promedio</th>
+                        <th>Reporte Individual</th>
                     </tr>
                 </thead>
 
@@ -71,13 +72,17 @@ include('includes/encabezado.php')
                         echo "<td><img src ='archivos/" . $alumnos['Email'] . "" . $alumnos['Foto'] . "' class='imgg'></td>";
                         echo "<td>" . $alumnos['Nombre'] . "</td>";
                         $promedio = mysqli_fetch_assoc(mysqli_query($cont, "SELECT AVG(evaluacion) as promedio FROM tareas WHERE clave='" . $_SESSION['clave'] . "' AND usuario ='" . $alumnos['Email'] . "'"));
-                        echo "<td>" . $promedio['promedio'] . "</td></tr>";
+                        echo "<td>" . $promedio['promedio'] . "</td>";
+                        echo "<td> <a class='editar' href='reporte_ind.php?userEm=" .$alumnos['Email'] . "'>Reporte Individual</a> </td></tr>";
+
                     } while ($alumnos = mysqli_fetch_assoc($resultado));
                 } else {
                     echo "<tr><td>No hay Alumnos Inscritos</td></tr>";
                 }
                 ?>
             </table>
+            
+
 
             <form action="reporte.php" method="post" autocomplete="off" class="formu">
                 <input class="formu-button" type="submit" value="Generar Reporte PDF">
@@ -97,6 +102,7 @@ include('includes/encabezado.php')
                     <tr>
                         <th>Num</th>
                         <th>Nombre Tarea</th>
+                        <th>Periodo</th>
                         <th>Calificacion</th>
                     </tr>
                 </thead>
@@ -108,6 +114,7 @@ include('includes/encabezado.php')
                     do {
                         echo "<td>Tarea" . $i + 1 . "</td>";
                         echo "<td>" . $acal['texto'] . "</td>";
+                        echo "<td>" . $acal['periodo'] . "</td>";
                         if ($acal['evaluacion'] != "") {
                             echo "<td>" . $acal['evaluacion'] . "</td></tr>";
                             $i++;
@@ -134,6 +141,10 @@ include('includes/encabezado.php')
                     </artricle>
                 </div>
 
+                <br>
+
+
+
                 <form action="reporteAlumnos.php" method="post" autocomplete="off" class="formu">
                 <input class="formu-button" type="submit" value="Generar Reporte PDF">
             </form>
@@ -146,7 +157,7 @@ include('includes/encabezado.php')
 
             
     </div>
-
+   
 </body>
 
 </html>

@@ -1,12 +1,10 @@
 <?php
 
 include('includes/conectar.php');
-session_start();
-if (!isset($_SESSION['user'])) {
-    header("location:index.php");
-}
+include('includes/secionesUser.php');
+
 if (!isset($_SESSION['clave'])) {
-    header("Location: 404.php");
+    header("Location: error.php");
 }
 
 if (isset($_REQUEST['cerrar'])) {
@@ -47,8 +45,10 @@ $pdf->SetFont('Arial','B',10);
 
 $pdf->SetFillColor(77,77,77);
 $pdf->SetTextColor(255,255,255);
-$pdf->Cell(90,10,'NOMBRES',0,0,'c',1);
-$pdf->Cell(90,10,'CALIFICACION',0,0,'c',1);
+$pdf->Cell(100,10,'NOMBRES',0,0,'c',1);
+$pdf->Cell(45,10,'PERIODO',0,0,'c',1);
+$pdf->Cell(45,10,'CALIFICACION',0,0,'c',1);
+
 
 
 $pdf->SetTextColor(0,0,0);
@@ -69,8 +69,9 @@ if (!$cont) {
 if ($ncal > 0) {
     // output data of each row
     do{
-$pdf->Cell(90,20, utf8_decode($acal['titulo']), 0);
-$pdf->Cell(90,20, utf8_decode($acal['evaluacion']), 0);
+$pdf->Cell(100,20, utf8_decode($acal['titulo']), 0);
+$pdf->Cell(45,20, utf8_decode($acal['periodo']), 0);
+$pdf->Cell(45,20, utf8_decode($acal['evaluacion']), 0);
 
 
 

@@ -1,11 +1,9 @@
 <?php
 include('includes/conectar.php');
-session_start();
-if (!isset($_SESSION['user'])) {
-    header("location:index.php");
-}
+include('includes/secionesUser.php');
+
 if (!isset($_SESSION['clave'])) {
-    header("Location: 404.php");
+    header("Location: error.php");
 }
 
 if (isset($_REQUEST['cerrar'])) {
@@ -66,7 +64,7 @@ include('includes/encabezado.php')
 
 
     </div>
-
+    
 </body>
 
 </html>

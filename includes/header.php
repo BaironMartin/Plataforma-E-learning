@@ -9,7 +9,10 @@ $as = mysqli_fetch_assoc($resultad);
         <?php
             if ($as['Tipo'] == 'Docente') {
                 echo "<a class=' editar' href='crearClase.php'>Gestionar Clase</a>";
-            } else 
+            } 
+            if ($as['Tipo'] == 'Estudiante') {
+                echo "<a class=' editar' href='unirse.php'>Gestionar Clase</a>";
+            } 
 
             ?>
             <a class=" cerrar" href="inicio.php?cerrar=1">Cerrar Secion</a>

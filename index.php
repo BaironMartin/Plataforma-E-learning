@@ -1,5 +1,6 @@
 <?php
 include('includes/conectar.php');
+include('function/funciones.php');
 
 session_start();
 if (isset($_SESSION['user'])) {
@@ -9,48 +10,33 @@ if (isset($_SESSION['user'])) {
 if (isset($_REQUEST['u']) && !empty($_REQUEST['u'])) {
     $u = $_POST['u'];
     $p = $_POST['p'];
-    $p= hash('sha512',$p);
-    $sql = "SELECT * FROM usuarios WHERE Email='$u' AND Clave='$p'";
-    $resultado = mysqli_query($cont, $sql);
-    if (mysqli_num_rows($resultado) == 1) {
-        $_SESSION['user'] = $u;
-        header("Location: inicio.php");
-    } else {
-        echo '<script type="text/javascript">
-    alert("Usuario y contrasenia Incorrecto");
-    window.location.href="index.php";
-    </script>';
+    echo $u,$p;
+    $clave = $_POST['g-recaptcha-response'];
+    $secret = '6LcRjHskAAAAABA0ioTMxTx7GwBSq8PfKKZBQcTo';
+
+    if (!$clave) {
+        header("Location: errors/errorlogin.php");
     }
-    mysqli_free_result($resultado);
-    mysqli_close($cont);
+
+    $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$secret&response=$clave");
+    $arr = json_decode($response, true);
+    if ($arr['success']) {
+        login_Index($u, $p);
+    } else {
+    }
 }
 
 
 if (isset($_REQUEST['user']) && !empty($_REQUEST['user'])) {
     $u = $_REQUEST['user'];
     $p = $_REQUEST['pass'];
-    $p= hash('sha512',$p);
     $n = $_REQUEST['nombre'];
+    $cc = $_REQUEST['cc'];
     $f = $_FILES['photo']['name'];
     $t = $_REQUEST['tipo'];
+    $g = $_REQUEST['grado'];
 
-    $id = $u;
-    $sql = "SELECT* FROM usuarios WHERE Email='$id'";
-    $resultado = mysqli_query($cont, $sql);
-    if (mysqli_num_rows($resultado) == 0) {
-
-        mysqli_query($cont, "INSERT INTO usuarios VALUE ('$u','$p','$n','$f','$t')");
-        move_uploaded_file($_FILES['photo']['tmp_name'], "archivos/" . $u . $f);
-        header("Location: index.php");
-    } else {
-        echo '<script type="text/javascript">
-    alert("Ya tíenes una cuenta");
-    window.location.href="index.php";
-    </script>';
-    }
-
-    mysqli_free_result($resultado);
-    mysqli_close($cont);
+    registrer_Index($u, $p, $n, $cc, $f, $t,$g);
 }
 
 include('includes/encabezado.php')
@@ -60,7 +46,7 @@ include('includes/encabezado.php')
 <body>
     <div class="pegajoso">
         <img src="img/logo.png" alt="">
-        <h1><?php include('includes/name.php')?></h1>
+        <h1><?php include('includes/name.php') ?></h1>
     </div>
     <br>
     <main>
@@ -82,23 +68,45 @@ include('includes/encabezado.php')
             <div class="contenedor_login_register">
                 <form action="index.php" method="post" class="formulario_login" autocomplete="off">
                     <h2>Iniciar Sesión</h2>
-                    <input type="email" name="u" id="" placeholder="Correo Electronico">
-                    <input type="password" name="p" id="" placeholder="Contraseña">
+                    <input type="email" name="u" id="" placeholder="Correo Electronico" required>
+                    <input type="password" name="p" id="" placeholder="Contraseña" required>
+                    <br><br>
+                    <div class="g-recaptcha" data-sitekey="6LcRjHskAAAAAEwUuhbrMYUDI4W2am3GtMfrr4dh"></div>
                     <button>Entrar</button>
+                    <br><a href="restaurarPasword.php">Olvide mi Password</a>
                 </form>
                 <form action="index.php" method="post" enctype="multipart/form-data" class="formulario_register">
                     <h2>Regístrarse</h2>
                     <input type="email" name="user" id="" placeholder="Correo Electronico">
                     <input type="password" name="pass" id="" placeholder="Contraseña">
                     <input type="text" name="nombre" id="" placeholder="Nombre Completo">
-                    <input type="file" name="photo" id="" placeholder="Imagen" require>
+                    <input type="number" name="cc" id="" placeholder="Documento de identidad">
+                    <input type="file" name="photo" id="" placeholder="Imagen" require><br><br>
                     <select name='tipo' id="tipo">
                         <option value=""></option>
                         <option value="Docente">Docente</option>
                         <option value="Estudiante">Estudiante</option>
                     </select>
                     <br>
-                    <input type="submit" value="Registrar">
+                    <select name='grado' id="grado">
+                        <option value=""></option>
+                        <option value="Prescolar">Prescolar</option>
+                        <option value="primero">primero</option>
+                        <option value="segundo">segundo</option>
+                        <option value="tercero">tercero</option>
+                        <option value="cuarto">cuarto</option>
+                        <option value="quinto">quinto</option>
+                        <option value="sexto">sexto</option>
+                        <option value="septimo">septimo</option>
+                        <option value="octavo">octavo</option>
+                        <option value="noveno">noveno</option>
+                        <option value="decimo">decimo</option>
+                        <option value="undecimo">undecimo</option>
+                        <option value="noaplica">No aplica</option>
+                    </select>
+                    <label>En caso de ser docente seleccionar no aplica</label>
+                    <br>
+                    <button>Registrar</button>
                 </form>
             </div>
         </div>

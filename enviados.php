@@ -1,11 +1,9 @@
 <?php
 include('includes/conectar.php');
-session_start();
-if (!isset($_SESSION['user'])) {
-  header("location:index.php");
-}
+include('includes/secionesUser.php');
+
 if (!isset($_SESSION['clave'])) {
-  header("Location: 404.php");
+  header("Location: error.php");
 }
 
 if (isset($_REQUEST['cerrar'])) {
@@ -22,9 +20,10 @@ $resultado1 = mysqli_query($cont, $sql);
 $n1 = mysqli_num_rows($resultado1);
 $a1 = mysqli_fetch_assoc($resultado1);
 
-$sql = ("SELECT* FROM mensaje WHERE de= '".$_SESSION['user']."' AND clave ='". $_SESSION['clave'] . "'");
+$sql = ("SELECT* FROM mensaje WHERE de= '".$_SESSION['user']."' AND clave ='". $_SESSION['clave'] ."'ORDER BY `mensaje`.`fecha` DESC");
 $res = mysqli_query($cont, $sql);
-$tot = mysqli_num_rows($res);
+$row = mysqli_num_rows($res);
+$asoc = mysqli_fetch_assoc($res);
 
 include('includes/encabezado.php')
 
@@ -62,7 +61,6 @@ include('includes/encabezado.php')
     <table >
       <thead>
       <tr>
-        <th ><strong>ID</strong></th>
         <th ><strong>Asunto</strong></th>
         <th ><strong>Para</strong></th>
         <th ><strong>Fecha</strong></th>
@@ -70,18 +68,29 @@ include('includes/encabezado.php')
       </thead>
       <?php
       $i = 0;
-      while ($row = mysqli_fetch_array($res)) { ?>
-        <tr>
-          <td ><?php echo $row['ID'] ?></td>
-          <td ><a href="leer copy.php?id=<?php echo $row['ID'] ?>"><?php echo $row['asunto'] ?></a></td>
-          <td ><?php echo $row['para'] ?></td>
-          <td ><?php echo $row['fecha'] ?></td>
+if ($row >0){
+
+      do { ?>
+        <tr onclick="window.location.href='leer copy.php?id=<?php echo $asoc['ID'] ?>'">
+          <td><a class="ender" href="leer copy.php?id=<?php echo $asoc['ID'] ?>"><?php echo $asoc['asunto'] ?></a></td>
+          <td><?php echo $asoc['para'] ?></td>
+          <td><?php echo $asoc['fecha'] ?></td>
         </tr>
       <?php $i++;
-      } ?>
+      }while ($asoc = mysqli_fetch_assoc($res));
+    }
+    else{
+      ?>
+      <tr>
+          <td colspan="4" >Sin correos enviados</td>
+        </tr>
+        <?php
+    }
+      ?>
+      
 </table>
   </div>
-
+  
 </body>
 
 </html>

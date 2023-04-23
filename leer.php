@@ -1,11 +1,9 @@
 <?php
 include('includes/conectar.php');
-session_start();
-if (!isset($_SESSION['user'])) {
-	header("location:index.php");
-}
+include('includes/secionesUser.php');
+
 if (!isset($_SESSION['clave'])) {
-    header("Location: 404.php");
+    header("Location: error.php");
 }
 
 if (isset($_REQUEST['cerrar'])) {
@@ -62,12 +60,31 @@ include('includes/encabezado.php')
 		</header>
 		<br>
 		<div class='contenedor_interno'>
-			<strong>De:</strong> <?php echo $row['de'] ?><br />
-			<strong>Fecha:</strong> <?php echo $row['fecha'] ?><br />
-			<strong>Asunto:</strong> <?php echo $row['asunto'] ?><br /><br />
-			<p><strong>Mensaje:</strong></p><br />
-			<?php echo $row['texto'] ?>
+			<h3><strong>De:</strong></h3>
+			<p><?php echo $row['de'] ?></p>
+			<h3><strong>Fecha:</strong> </h3>
+			<p><?php echo $row['fecha'] ?>
+			<h3><strong>Asunto:</strong></h3>
+			<p><?php echo $row['asunto'] ?></p><br>
+			<h3><strong>Mensaje:</strong></h3>
+			<div >
+				<h4>🗎 archivos adjuntos</h4>
+				<?php
+				if (empty($row['file']) || $row['file'] == "vacio") {
+				?>
+					<p><?php echo $row['file']; ?> </p>
+				<?php
+				} else {
+
+				?>
+					<p><?php echo $row['file']; ?> <?php echo "<a href='archivos/archivosEmail/" . $row['de'] . $row['file'] . "'>Descargas</a>"; ?></p>
+			</div>
+		<?php } ?>
+		<br>
+		<div><?php echo $row['texto'] ?></div>
+
 		</div>
+
 
 		<?php
 
@@ -76,7 +93,7 @@ include('includes/encabezado.php')
 		}
 		?>
 	</div>
-
+	
 </body>
 
 </html>

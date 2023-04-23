@@ -1,11 +1,9 @@
 <?php
 include('includes/conectar.php');
-session_start();
-if (!isset($_SESSION['user'])) {
-    header("location:index.php");
-}
+include('includes/secionesUser.php');
+
 if (!isset($_SESSION['clave'])) {
-    header("Location: 404.php");
+    header("Location: error.php");
 }
 
 if (isset($_REQUEST['cerrar'])) {
@@ -52,16 +50,8 @@ include('includes/encabezado.php')
 
 
 <body>
-<div class="pegajoso">
-        <h2 class="titulo1">PREPARATORIA RANCHO HUMILDE</h2>
-        <div class="container2">
-            <a class=" editar"  href="foro.php">volver</a>
-            <a class=" cerrar" href="inicio.php?cerrar=1">Cerrar Secion</a>
-        </div>
-    </div>
-    <?php
-    echo ("<h1 > "  . $a1['nombre'] . "</h1><br>");
-
+<?php
+    include('includes/header.php');
     ?>
     <hr>
 
@@ -115,6 +105,7 @@ include('includes/encabezado.php')
 
 
 </p>
+
 </body>
 
 

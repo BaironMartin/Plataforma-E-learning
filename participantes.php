@@ -1,12 +1,9 @@
 <?php
 include('includes/conectar.php');
-session_start();
-if (!isset($_SESSION['user'])) {
-    header("location:index.php");
+include('includes/secionesUser.php');
 
-}
 if (!isset($_SESSION['clave'])) {
-    header("Location: 404.php");
+    header("Location: error.php");
 }
 
 
@@ -32,7 +29,7 @@ $alumnos = mysqli_fetch_assoc($resultado);
 $atipo = mysqli_fetch_assoc(mysqli_query($cont, "SELECT * FROM usuarios WHERE Email ='" . $_SESSION['user'] . "'"));
 
 if (isset($_REQUEST['e'])) {
-    echo $_REQUEST['e'];
+    
     $sql2 = ("DELETE FROM misclases WHERE idmiclase=" . $_REQUEST['e']);
     mysqli_query($cont, $sql2);
     header("location:participantes.php");
@@ -95,6 +92,7 @@ include('includes/encabezado.php')
             ?>
         </table>
     </div>
+    
 </body>
 
 

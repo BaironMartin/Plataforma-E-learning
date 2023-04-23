@@ -1,11 +1,9 @@
 <?php
 include('includes/conectar.php');
-session_start();
-if (!isset($_SESSION['user'])) {
-    header("location:index.php");
-}
+include('includes/secionesUser.php');
+
 if (!isset($_SESSION['clave'])) {
-    header("Location: 404.php");
+    header("Location: error.php");
 }
 
 if (isset($_REQUEST['cerrar'])) {
@@ -27,15 +25,14 @@ if (isset($_REQUEST['subir']) && !empty($_REQUEST['subir'])) {
         alert("El Documento ya Existe, Por favor Cambie el Nombre del Documento y Vuelva a Cargarlo ");
         window.location.href="archivos.php";
         </script>';
-        
     } else {
-        
-    mysqli_query($cont, "INSERT INTO archivos VALUE (NULL,'$namefile','$tipo','$tamanio','$clave','$usuario')");
+
+        mysqli_query($cont, "INSERT INTO archivos VALUE (NULL,'$namefile','$tipo','$tamanio','$clave','$usuario')");
         $sql = "SELECT * FROM archivos WHERE nombre ='" . $namefile . "'";
         $resultad = mysqli_query($cont, $sql);
         $as = mysqli_fetch_assoc($resultad);
         $idar = $as['idarchivos'];
-        move_uploaded_file($_FILES['archivo']['tmp_name'], "archivosClases/" . $idar . $namefile);
+        move_uploaded_file($_FILES['archivo']['tmp_name'], "archivos/archivosClases/" . $idar . $namefile);
         header("location:archivos.php");
     }
 }
@@ -53,8 +50,7 @@ $a1 = mysqli_fetch_assoc($resultado1);
 if (isset($_REQUEST['e'])) {
 
     $as = mysqli_fetch_assoc(mysqli_query($cont, "SELECT * FROM archivos WHERE idarchivos='" . $_REQUEST['e'] . "'"));
-    $name = 'archivosClases/' . $as['idarchivos'] . $as['nombre'];
-    echo $name;
+    $name = 'archivos/archivosClases/' . $as['idarchivos'] . $as['nombre'];
     unlink($name);
 
     mysqli_query($cont, "DELETE FROM archivos WHERE idarchivos=" . $_REQUEST['e']);
@@ -97,7 +93,6 @@ include('includes/encabezado.php')
                 <tr>
                     <th>Id</th>
                     <th>Nombre</th>
-                    <th>Tipo</th>
                     <th>Tamaño</th>
                     <?php if ($atipo['Tipo'] == 'Docente') {
                         echo "<th>Eliminar</th>";
@@ -113,12 +108,11 @@ include('includes/encabezado.php')
                     echo "<tr>";
                     echo "<td>" . $archivosbase['idarchivos'] . "</td>";
                     echo "<td>" . $archivosbase['nombre'] . "</td>";
-                    echo "<td>" . $archivosbase['tipo'] . "</td>";
                     echo "<td>" . $archivosbase['tamanio'] . "</td>";
                     if ($atipo['Tipo'] == 'Docente') {
                         echo "<td><a href='archivos.php?e=" . $archivosbase['idarchivos'] . "'>Eliminar</a></td>";
                     }
-                    echo "<td><a href='archivosClases/" . $archivosbase['idarchivos'] . $archivosbase['nombre'] . "'>Descargas</a></td>";
+                    echo "<td><a href='archivos/archivosClases/" . $archivosbase['idarchivos'] . $archivosbase['nombre'] . "'>Descargas</a></td>";
                     echo "</tr>";
                 } while ($archivosbase = mysqli_fetch_assoc($qarchivos));
             } else {
@@ -135,6 +129,7 @@ include('includes/encabezado.php')
 
 
 </body>
+
 </html>
 <?php
 

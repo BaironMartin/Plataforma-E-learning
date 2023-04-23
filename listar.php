@@ -1,11 +1,9 @@
 <?php
 include('includes/conectar.php');
-session_start();
-if (!isset($_SESSION['user'])) {
-  header("location:index.php");
-}
+include('includes/secionesUser.php');
+
 if (!isset($_SESSION['clave'])) {
-  header("Location: 404.php");
+  header("Location: error.php");
 }
 
 if (isset($_REQUEST['cerrar'])) {
@@ -22,9 +20,12 @@ $resultado1 = mysqli_query($cont, $sql);
 $n1 = mysqli_num_rows($resultado1);
 $a1 = mysqli_fetch_assoc($resultado1);
 
-$sql = ("SELECT* FROM mensaje WHERE para= '" . $_SESSION['user'] . "' AND clave ='" . $_SESSION['clave'] . "'");
-$res = mysqli_query($cont, $sql);
-$tot = mysqli_num_rows($res);
+$res = mysqli_query($cont, "SELECT* FROM mensaje WHERE para= '" . $_SESSION['user'] . "' AND clave ='" . $_SESSION['clave'] . "'ORDER BY `mensaje`.`fecha` DESC");
+$row = mysqli_num_rows($res);
+$_array = mysqli_fetch_assoc($res);
+
+
+
 
 include('includes/encabezado.php')
 
@@ -43,7 +44,7 @@ include('includes/encabezado.php')
   ?>
   <hr>
 
-  <h1 style="margin-bottom: -50px;">Calificaciones</h1>
+  <h1 style="margin-bottom: -50px;">Correo Interno</h1>
   <div class="menu">
     <h1><?php include('includes/menu.php') ?></h1>
   </div>
@@ -63,31 +64,30 @@ include('includes/encabezado.php')
     <table>
       <thead>
         <tr>
-          <th><strong>ID</strong></th>
           <th><strong>Asunto</strong></th>
           <th><strong>De</strong></th>
           <th><strong>Fecha</strong></th>
         </tr>
       </thead>
+
+
       <?php
-      $i = 0;
-      while ($row = mysqli_fetch_assoc($res)) { ?>
-        <tr bgcolor="<?php if ($row['leido'] == "si") {
-                        echo "#FFE8E8";
-                      } else {
-                        if ($i % 2 == 0) {
-                          echo "#FFE7CE";
-                        } else {
-                          echo "#FFCAB0";
-                        }
-                      } ?>">
-          <td><?php echo $row['ID'] ?></td>
-          <td><a href="leer.php?id=<?php echo $row['ID'] ?>"><?php echo $row['asunto'] ?></a></td>
-          <td><?php echo $row['de'] ?></td>
-          <td><?php echo $row['fecha'] ?></td>
-        </tr>
-      <?php $i++;
-      } ?>
+      if ($row >0){
+
+      do {
+        ?>
+        <tr onclick="window.location.href='leer.php?id=<?php echo $_array['ID'] ?>'">
+        <?php
+        echo "<td><a href='leer.php?id=" . $_array['ID'] . "'>" . $_array['asunto'] . "</a></td>";
+        echo "<td>" . $_array['de'] . "</td>";
+        echo "<td>" . $_array['fecha'] . "</td></tr>";
+      } while($_array = mysqli_fetch_assoc($res));
+    }
+    else{
+      echo "<tr><td>Sin Correos Resividos</td></tr>";
+    }
+      ?>
+
     </table>
   </div>
 

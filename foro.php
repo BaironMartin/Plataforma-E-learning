@@ -1,11 +1,10 @@
 <?php
+date_default_timezone_set('America/Bogota');
 include('includes/conectar.php');
-session_start();
-if (!isset($_SESSION['user'])) {
-    header("location:index.php");
-}
+include('includes/secionesUser.php');
+
 if (!isset($_SESSION['clave'])) {
-    header("Location: 404.php");
+    header("Location: error.php");
 }
 
 if (isset($_REQUEST['cerrar'])) {
@@ -17,7 +16,9 @@ if (isset($_REQUEST['tema'])) {
     $u = $_SESSION['user'];
     $c = $_SESSION['clave'];
     $t = $_REQUEST['tema'];
-    mysqli_query($cont, "INSERT INTO temas VALUES(NULL,'$c','$u','$t',NULL)");
+    $fe= $_REQUEST['fe'];
+
+    mysqli_query($cont, "INSERT INTO temas VALUES(NULL,'$c','$u','$t','$fe',NULL)");
     header("location:foro.php");
 }
 
@@ -34,8 +35,8 @@ $a1 = mysqli_fetch_assoc($resultado1);
 $atipo = mysqli_fetch_assoc(mysqli_query($cont, "SELECT * FROM usuarios WHERE Email ='" . $_SESSION['user'] . "'"));
 
 
-if (isset($_REQUEST['e'])) {
-    mysqli_query($cont, "DELETE FROM temas WHERE  idtema=" . $_REQUEST['e']);
+if (isset($_REQUEST['ef'])) {
+    mysqli_query($cont, "DELETE FROM temas WHERE  idtema=" . $_REQUEST['ef']);
     header("location:foro.php");
 }
 include('includes/encabezado.php')
@@ -62,6 +63,7 @@ include('includes/encabezado.php')
         ?>
             <form action="foro.php" method="post" autocomplete="off" class="formu" style="margin-top: -50px;">
                 <textarea class="formu-input" name="tema" placeholder="Nuevo Tema" cols="30" rows="10" required></textarea>
+                <input class="formu-input" type="date" name="fe" placeholder="Fecha De Entrega" required>
                 <input class="formu-button" type="submit" value="Agregar Tema">
             </form>
         <?php
@@ -72,7 +74,7 @@ include('includes/encabezado.php')
                 <tr>
                     <th>Indice</th>
                     <th>Tema</th>
-                    <th>Fecha </th>
+                    <th>Fecha Cierre </th>
                     <th>Numero de Comentarios</th>
                     <?php
                     if ($atipo['Tipo'] == 'Docente') {
@@ -85,19 +87,34 @@ include('includes/encabezado.php')
             </thead>
             <?php
             if ($ntema > 0) {
-                $contar =  mysqli_num_rows(mysqli_query($cont, "SELECT * FROM comentario WHERE idtema =".$atema['idtema'])); 
                 
+                
+
                 $i = 1;
                 do {
+                    $contar =  mysqli_num_rows(mysqli_query($cont, "SELECT * FROM comentario WHERE idtema =".$atema['idtema'])); 
+                    $fecha_actual = (date("Y-m-d", time()));
+                $fecha_entrada = (date($atema['cierre']));
                     echo "<tr>";
                     echo "<td> Tema" . $i . "</td>";
                     echo "<td>" . $atema['tema'] . "</td>";
-                    echo "<td>" . $atema['fecha'] . "</td>";
+                    echo "<td>" . $atema['cierre'] . "</td>";
                     echo "<td>" . $contar . "</td>";
                     if ($atipo['Tipo'] == 'Docente') {
                         echo "<td><a href='foro.php?ef=" . $atema['idtema'] . "'>Eliminar</a></td>";
+                        echo "<td><a href='comentar.php?idtema=" . $atema['idtema'] . "'>Comentar en Foro</a></td>";
                     }
-                    echo "<td><a href='comentar.php?idtema=" . $atema['idtema'] . "'>Comentar en Foro</a>";
+                    if ($atipo['Tipo'] == 'Estudiante' ) {
+                        if(($fecha_actual > $fecha_entrada)){
+                            echo "<td>Foro Cerrado</td>";
+                        }
+                        else{
+                            echo "<td><a href='comentar.php?idtema=" . $atema['idtema'] . "'>Comentar en Foro</a></td>";
+                        }
+                        
+                        
+                    }
+
                     $i++;
                 } while ($atema = mysqli_fetch_assoc($qtema));
             } else {
@@ -113,7 +130,7 @@ include('includes/encabezado.php')
             </script>
         </table>
     </div>
-
+    
 </body>
 
 </html>

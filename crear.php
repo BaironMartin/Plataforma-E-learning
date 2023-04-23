@@ -1,12 +1,9 @@
-
 <?php
 include('includes/conectar.php');
-session_start();
-if (!isset($_SESSION['user'])) {
-	header("location:index.php");
-}
+include('includes/secionesUser.php');
+
 if (!isset($_SESSION['clave'])) {
-	header("Location: 404.php");
+	header("Location: error.php");
 }
 
 if (isset($_REQUEST['cerrar'])) {
@@ -36,14 +33,48 @@ $as = mysqli_fetch_assoc($resultad);
 
 
 
-if (isset($_REQUEST['para'])) {
+if (isset($_REQUEST['enviar'])) {
 	$u = $_SESSION['user'];
 	$c = $_SESSION['clave'];
 	$para = $_REQUEST['para'];
 	$asunto = $_REQUEST['asunto'];
 	$texto = $_REQUEST['texto'];
+	$file = $_FILES['file']['name'];
 
-	mysqli_query($cont, "INSERT INTO mensaje VALUES(NULL,'$para','$u',NULL,NULL,'$asunto','$texto','$c')");
+	if ($file == "") {
+		$file = "vacio";
+	} else {
+		$f = $file;
+		move_uploaded_file($_FILES['file']['tmp_name'], "archivos/ArchivosEmail/" . $u . $f);
+	}
+
+	mysqli_query($cont, "INSERT INTO mensaje VALUES(NULL,'$para','$u',NULL,NULL,'$asunto','$texto','$c','$file')");
+	header("location:email.php");
+}
+
+if (isset($_REQUEST['enviartodo'])) {
+	$u = $_SESSION['user'];
+	$c = $_SESSION['clave'];
+	
+	$asunto = $_REQUEST['asunto'];
+	$texto = $_REQUEST['texto'];
+	$file = $_FILES['file']['name'];
+
+	$sqlcorreo = ("SELECT* FROM misclases, usuarios WHERE misclases.usuario=usuarios.Email AND misclases.clave='" . $_SESSION['clave'] . "'");
+	$resultadocorreo = mysqli_query($cont, $sqlcorreo);
+	$ncorreo = mysqli_num_rows($resultadocorreo);
+	$alumnoscorreo = mysqli_fetch_assoc($resultadocorreo);
+
+	if ($file == "") {
+		$file = "vacio";
+	} else {
+		$f = $file;
+		move_uploaded_file($_FILES['file']['tmp_name'], "archivos/ArchivosEmail/" . $u . $f);
+	}
+	do {
+		$para = $alumnoscorreo['Email'];
+		mysqli_query($cont, "INSERT INTO mensaje VALUES(NULL,'$para','$u',NULL,NULL,'$asunto','$texto','$c','$file')");
+	} while ($alumnoscorreo = mysqli_fetch_assoc($resultadocorreo));
 	header("location:email.php");
 }
 
@@ -83,8 +114,8 @@ include('includes/encabezado.php')
 		<br>
 
 
-		<form action="crear.php" method="post" autocomplete="off" class="formu" style="margin-top: -50px;">
-			<select class="formu-input" name="para" required>
+		<form action="crear.php" method="post" enctype="multipart/form-data" autocomplete="off" class="formu" style="margin-top: -50px;">
+			<select class="" name="para" <?php if ($as['Tipo'] != 'Docente') { ?>required <?php } ?>>
 
 				<option value="">Seleccione el Destinatario</option>
 				<?php
@@ -105,16 +136,24 @@ include('includes/encabezado.php')
 				} while ($alumnos = mysqli_fetch_assoc($resultado));
 				?>
 
-
-
-
 			</select name="para"><br><br>
 			<input class="formu-input" type="text" name="asunto" placeholder="Asunto" required> <br><br>
 			<textarea id="ckeditor" class="formu-input ckeditor" name="texto" placeholder="Agregar Nuevo Comentario" cols="30" rows="10" required></textarea>
+			<br>
+			<input type="file" class="formu-input" name="file" value="">
+			<br>
+
 			<input class="formu-button" type="submit" name="enviar" value="Enviar">
+			<?php
+			if ($as['Tipo'] == 'Docente') { ?>
+				<input class="formu-button" type="submit" name="enviartodo" value="Enviar A Todos">
+			<?php
+			}
+			?>
 		</form>
 
 	</div>
+
 
 </body>
 

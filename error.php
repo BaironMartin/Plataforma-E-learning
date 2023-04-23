@@ -6,30 +6,167 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" tipe="text/class" href="css/normalize.css">
-    <link rel="stylesheet" tipe="text/class" href="css/estilos.css?">
-    <title>Plataforma E-LEARNING Plan de Estudio</title>
-    <link rel="icon" href="img/ico/free bsd.ico">
-    <script type="text/javascript" src="js/observacionesbasicas/ckeditor/ckeditor.js"></script>
-
+    <link rel="stylesheet" href="css/style.css?v=<?php echo (rand()); ?>">
+    <title>Plataforma E-LEARNING login and register</title>
+    <script type="text/javascript" src="js/ckeditor/ckeditor.js"></script>
+    <link rel="icon" href="img/logo.ico">
 </head>
 
 <body>
-    <div class="pegajoso">
-        <h2 class="titulo1">ERROR 404</h2>
+    <!-- partial:index.partial.html -->
+    <div class="container container-star">
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-1"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
+        <div class="star-2"></div>
     </div>
-
-    <div class="cont_404" style="margin-top: 20px;">
-        <div class="col_side">
-            <img src="http://www.biografiasyvidas.com/monografia/einstein/fotos/einstein_1947.jpg">
+    <div class="container container-bird">
+        <div class="bird bird-anim">
+            <div class="bird-container">
+                <div class="wing wing-left">
+                    <div class="wing-left-top"></div>
+                </div>
+                <div class="wing wing-right">
+                    <div class="wing-right-top"></div>
+                </div>
+            </div>
         </div>
+        <div class="bird bird-anim">
+            <div class="bird-container">
+                <div class="wing wing-left">
+                    <div class="wing-left-top"></div>
+                </div>
+                <div class="wing wing-right">
+                    <div class="wing-right-top"></div>
+                </div>
+            </div>
+        </div>
+        <div class="bird bird-anim">
+            <div class="bird-container">
+                <div class="wing wing-left">
+                    <div class="wing-left-top"></div>
+                </div>
+                <div class="wing wing-right">
+                    <div class="wing-right-top"></div>
+                </div>
+            </div>
+        </div>
+        <div class="bird bird-anim">
+            <div class="bird-container">
+                <div class="wing wing-left">
+                    <div class="wing-left-top"></div>
+                </div>
+                <div class="wing wing-right">
+                    <div class="wing-right-top"></div>
+                </div>
+            </div>
+        </div>
+        <div class="bird bird-anim">
+            <div class="bird-container">
+                <div class="wing wing-left">
+                    <div class="wing-left-top"></div>
+                </div>
+                <div class="wing wing-right">
+                    <div class="wing-right-top"></div>
+                </div>
+            </div>
+        </div>
+        <div class="bird bird-anim">
+            <div class="bird-container">
+                <div class="wing wing-left">
+                    <div class="wing-left-top"></div>
+                </div>
+                <div class="wing wing-right">
+                    <div class="wing-right-top"></div>
+                </div>
+            </div>
+        </div>
+        <div class="container-title">
+            <div class="title">
+                <div class="number">4</div>
+                <div class="moon">
+                    <div class="face">
+                        <div class="mouth"></div>
+                        <div class="eyes">
+                            <div class="eye-left"></div>
+                            <div class="eye-right"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="number">4</div>
+            </div>
+            <div class="subtitle">Vaya. Parece que tomaste un giro equivocado..</div>
 
-        <div class=" col_side">
-
-            <P>"Los que nunca ha cometido ERRORES es porque nunca han intentado hacer cosas NUEVAS y DIFERENTES"<br>
-            <strong>(albert einstein)</strong></P>
+            <?php
+            if (!isset($_SESSION['user'])) {
+                echo "<a  href='index.php'><button>Volver</button></a>";
+            } else {
+                if (!isset($_SESSION['clave'])) {
+                    echo "<a  href='inicio.php'><button>Volver</button></a>";
+                }
+            }
+            ?>
 
         </div>
-
     </div>
+    <!-- partial -->
+
 </body>
+
 </html>
