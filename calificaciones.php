@@ -3,7 +3,7 @@ include('includes/conectar.php');
 include('includes/secionesUser.php');
 
 if (!isset($_SESSION['clave'])) {
-    header("Location: error.php");
+    header("Location: error_handler.php");
 }
 if (isset($_REQUEST['cerrar'])) {
     session_destroy();

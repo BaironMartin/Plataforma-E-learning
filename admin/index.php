@@ -9,7 +9,7 @@ generarTokenCSRF();
 if (isset($_REQUEST['u']) && !empty($_REQUEST['u'])) {
     // Validar token CSRF
     if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
-        header("Location: Errors/errorlogin.php");
+        header("Location: error_handler.php?t=captcha");
         exit;
     }
     
@@ -44,10 +44,10 @@ if (isset($_REQUEST['u']) && !empty($_REQUEST['u'])) {
             
             header("Location: inicio_admin.php");
         } else {
-            header("Location: errors/errorlogin1.php");
+            header("Location: error_handler.php?t=admin");
         }
     } else {
-        header("Location: errors/errorlogin1.php");
+        header("Location: error_handler.php?t=admin");
     }
     
     mysqli_stmt_close($stmt);

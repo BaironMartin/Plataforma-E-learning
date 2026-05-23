@@ -3,7 +3,7 @@ include('includes/conectar.php');
 include('includes/secionesUser.php');
 
 if (!isset($_SESSION['clave'])) {
-    header("Location: error.php");
+    header("Location: error_handler.php");
 }
 
 if (isset($_REQUEST['cerrar'])) {
@@ -45,7 +45,7 @@ $stmt4->close();
 if (isset($_REQUEST['enviar'])) {
     // Validar token CSRF
     if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
-        header("Location: errors/errorlogin.php");
+        header("Location: error_handler.php?t=login");
         exit();
     }
     
@@ -56,7 +56,7 @@ if (isset($_REQUEST['enviar'])) {
     $texto = trim($_REQUEST['texto']);
     
     if (!$para || empty($asunto) || empty($texto)) {
-        header("Location: errors/errorlogin.php");
+        header("Location: error_handler.php?t=login");
         exit();
     }
     
@@ -70,7 +70,7 @@ if (isset($_REQUEST['enviar'])) {
         $uploadFile = validarArchivo($_FILES['file'], ['pdf', 'doc', 'docx', 'txt', 'jpg', 'png'], 5242880);
         
         if (!$uploadFile['success']) {
-            header("Location: errors/errorlogin.php");
+            header("Location: error_handler.php?t=login");
             exit();
         }
         
@@ -90,7 +90,7 @@ if (isset($_REQUEST['enviar'])) {
 if (isset($_REQUEST['enviartodo'])) {
     // Validar token CSRF
     if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
-        header("Location: errors/errorlogin.php");
+        header("Location: error_handler.php?t=login");
         exit();
     }
     
@@ -100,7 +100,7 @@ if (isset($_REQUEST['enviartodo'])) {
     $texto = trim($_REQUEST['texto']);
     
     if (empty($asunto) || empty($texto)) {
-        header("Location: errors/errorlogin.php");
+        header("Location: error_handler.php?t=login");
         exit();
     }
     
@@ -120,7 +120,7 @@ if (isset($_REQUEST['enviartodo'])) {
         $uploadFile = validarArchivo($_FILES['file'], ['pdf', 'doc', 'docx', 'txt', 'jpg', 'png'], 5242880);
         
         if (!$uploadFile['success']) {
-            header("Location: errors/errorlogin.php");
+            header("Location: error_handler.php?t=login");
             exit();
         }
         

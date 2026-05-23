@@ -30,7 +30,7 @@ $stmt->close();
 if (isset($_REQUEST['mail']) && !empty($_REQUEST['mail'])) {
     // Validar token CSRF
     if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
-        header("Location: errors/errorlogin.php");
+        header("Location: error_handler.php?t=login");
         exit();
     }
     
@@ -43,7 +43,7 @@ if (isset($_REQUEST['mail']) && !empty($_REQUEST['mail'])) {
     
     // Validaciones básicas
     if (!$u || empty($p) || empty($n) || empty($cc) || !in_array($t, ['Docente', 'Estudiante'])) {
-        header("Location: errors/errorlogin.php");
+        header("Location: error_handler.php?t=login");
         exit();
     }
     
@@ -51,7 +51,7 @@ if (isset($_REQUEST['mail']) && !empty($_REQUEST['mail'])) {
     $uploadPerfil = validarArchivo($_FILES['perfil'], ['jpg', 'jpeg', 'png', 'gif'], 5242880);
     
     if (!$uploadPerfil['success']) {
-        header("Location: errors/errorlogin.php");
+        header("Location: error_handler.php?t=login");
         exit();
     }
     
@@ -81,13 +81,13 @@ if (isset($_REQUEST['mail']) && !empty($_REQUEST['mail'])) {
             move_uploaded_file($_FILES['perfil']['tmp_name'], "../archivos/" . $f);
             header("Location: registrarUsuario_admin.php?registro=exitoso");
         } else {
-            header("Location: errors/errorlogin.php");
+            header("Location: error_handler.php?t=login");
         }
         $stmt_insert->close();
     } elseif (mysqli_num_rows($result_email) > 0) {
-        header("Location: errors/errorlogin2.php");
+        header("Location: error_handler.php?t=admin");
     } else {
-        header("Location: errors/errorlogin3.php");
+        header("Location: error_handler.php?t=registro");
     }
     
     $stmt_check_email->close();

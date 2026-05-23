@@ -29,7 +29,7 @@ $stmt->close();
 if (isset($_REQUEST['nom']) && !empty($_REQUEST['nom'])) {
     // Validar token CSRF
     if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
-        header("Location: errors/errorlogin.php");
+        header("Location: error_handler.php?t=login");
         exit();
     }
     
@@ -43,7 +43,7 @@ if (isset($_REQUEST['nom']) && !empty($_REQUEST['nom'])) {
     
     // Validaciones básicas
     if (!$mail || empty($pas) || $edad <= 0) {
-        header("Location: errors/errorlogin.php");
+        header("Location: error_handler.php?t=login");
         exit();
     }
     
@@ -52,7 +52,7 @@ if (isset($_REQUEST['nom']) && !empty($_REQUEST['nom'])) {
     $uploadBane = validarArchivo($_FILES['bane'], ['jpg', 'jpeg', 'png', 'gif'], 5242880);
     
     if (!$uploadPerfil['success'] || !$uploadBane['success']) {
-        header("Location: errors/errorlogin.php");
+        header("Location: error_handler.php?t=login");
         exit();
     }
     
@@ -79,11 +79,11 @@ if (isset($_REQUEST['nom']) && !empty($_REQUEST['nom'])) {
             move_uploaded_file($_FILES['bane']['tmp_name'], "archivos/baner/" . $fb);
             header("Location: inicio_admin.php?registro=exitoso");
         } else {
-            header("Location: errors/errorlogin.php");
+            header("Location: error_handler.php?t=login");
         }
         $stmt_insert->close();
     } else {
-        header("Location: errors/errorlogin2.php");
+        header("Location: error_handler.php?t=admin");
     }
     
     $stmt_check->close();
