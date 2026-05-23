@@ -43,7 +43,7 @@ function login_Index($u, $p){
     mysqli_free_result($result);
 }
 
-function registrer_Index($u, $p, $n, $cc, $f, $t, $g){
+function registrer_Index($u, $p, $n, $cc, $t, $g){
     global $cont;
     
     // Validar archivo subido
@@ -57,6 +57,7 @@ function registrer_Index($u, $p, $n, $cc, $f, $t, $g){
     
     $file_type = $_FILES['photo']['type'];
     $file_size = $_FILES['photo']['size'];
+    $file_tmp = $_FILES['photo']['tmp_name'];
     $file_ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
     
     if (!in_array($file_type, $allowed_types) || !in_array($file_ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
@@ -79,20 +80,20 @@ function registrer_Index($u, $p, $n, $cc, $f, $t, $g){
     $result = mysqli_stmt_get_result($stmt);
     
     if (mysqli_num_rows($result) == 0) {
-        // Insertar nuevo usuario
+        // Generar nombre seguro para el archivo
+        $safe_filename = preg_replace("/[^a-zA-Z0-9._-]/", "", $_FILES['photo']['name']);
+        $new_filename = $u . '_' . time() . '_' . $safe_filename;
+        
+        // Insertar nuevo usuario con el nombre del archivo generado
         $insert_stmt = mysqli_prepare($cont, "INSERT INTO usuarios VALUES (?, ?, ?, ?, ?, ?, ?)");
-        mysqli_stmt_bind_param($insert_stmt, "sssssss", $u, $p_hash, $n, $cc, $f, $t, $g);
+        mysqli_stmt_bind_param($insert_stmt, "sssssss", $u, $p_hash, $n, $cc, $new_filename, $t, $g);
         
         if (mysqli_stmt_execute($insert_stmt)) {
-            // Generar nombre seguro para el archivo
-            $safe_filename = preg_replace("/[^a-zA-Z0-9._-]/", "", $f);
-            $new_filename = $u . '_' . time() . '_' . $safe_filename;
-            
-            move_uploaded_file($_FILES['photo']['tmp_name'], "archivos/" . $new_filename);
+            move_uploaded_file($file_tmp, "archivos/" . $new_filename);
             
             mysqli_stmt_close($insert_stmt);
             mysqli_stmt_close($stmt);
-            header("Location: index.php");
+            header("Location: index.php?registro=exitoso");
             return;
         }
     }
