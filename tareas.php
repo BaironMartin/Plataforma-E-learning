@@ -7,7 +7,7 @@ if (isset($_REQUEST['cerrar'])) {
     header("location:index.php");
 }
 if (!isset($_SESSION['clave'])) {
-    header("Location: error.php");
+    header("Location: error_handler.php");
 }
 
 $qtareas = mysqli_query($cont, "SELECT * FROM plan WHERE clave ='" . $_SESSION['clave'] . "' ORDER BY  fecha ASC ");

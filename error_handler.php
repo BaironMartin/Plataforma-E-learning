@@ -6,8 +6,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Error - Plataforma E-LEARNING</title>
     <link rel="icon" href="img/logo.ico">
-    <link rel="stylesheet" href="css/normalize.css">
-    <link rel="stylesheet" href="css/style.css?v=<?php echo rand(); ?>">
+    <link rel="stylesheet" href="css/estilos.css?v=<?php echo rand(); ?>">
+    <style>
+        /* Estilos específicos para la página de error */
+        body {
+            overflow: hidden;
+        }
+        .container-star {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+        }
+        .star-1, .star-2 {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        .container-bird {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: white;
+            text-align: center;
+        }
+        .title {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 8rem;
+            font-weight: bold;
+        }
+        .moon {
+            width: 100px;
+            height: 100px;
+            background: #f5f5f5;
+            border-radius: 50%;
+            box-shadow: 0 0 40px rgba(255,255,255,0.3);
+        }
+        .subtitle {
+            font-size: 1.5rem;
+            margin: 20px 0;
+        }
+        button {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.3s;
+        }
+        button:hover {
+            transform: translateY(-3px);
+        }
+    </style>
 </head>
 <body>
     <div class="container container-star">

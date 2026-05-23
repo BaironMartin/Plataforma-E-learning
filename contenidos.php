@@ -11,7 +11,7 @@ if (isset($_REQUEST['clave']) && !empty($_REQUEST['clave'])) {
     $_SESSION['clave'] = $_REQUEST['clave'];
 }
 if (!isset($_SESSION['clave'])) {
-    header("Location: error.php");
+    header("Location: error_handler.php");
 }
 
 

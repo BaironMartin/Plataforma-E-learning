@@ -4,7 +4,7 @@ include('includes/secionesUser.php');
 include('includes/csrf.php');
 
 if (!isset($_SESSION['clave'])) {
-    header("Location: error.php");
+    header("Location: error_handler.php");
 }
 
 

@@ -5,7 +5,7 @@ include('includes/secionesUser.php');
 require_once('includes/upload_security.php');
 
 if (!isset($_SESSION['clave'])) {
-    header("Location: error.php");
+    header("Location: error_handler.php");
 }
 
 if (isset($_REQUEST['cerrar'])) {
@@ -27,7 +27,7 @@ if (isset($_REQUEST['tarea'])) {
 if (isset($_REQUEST['idtarea']) && !empty($_REQUEST['idtarea']) && (isset($_REQUEST['cal']) && !empty($_REQUEST['cal']))) {
     // Validar token CSRF y que sea docente
     if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
-        header("Location: errors/errorlogin.php");
+        header("Location: error_handler.php?t=login");
         exit();
     }
     
@@ -96,7 +96,7 @@ $stmt_clase->close();
 if (isset($_REQUEST['texto']) && !empty($_REQUEST['texto'])) {
     // Validar token CSRF
     if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
-        header("Location: errors/errorlogin.php");
+        header("Location: error_handler.php?t=login");
         exit();
     }
     
@@ -120,7 +120,7 @@ if (isset($_REQUEST['texto']) && !empty($_REQUEST['texto'])) {
         $uploadArchivo = validarArchivo($_FILES['archivo'], ['pdf', 'doc', 'docx', 'txt', 'jpg', 'png'], 10485760);
         
         if (!$uploadArchivo['success']) {
-            header("Location: errors/errorlogin.php");
+            header("Location: error_handler.php?t=login");
             exit();
         }
         
