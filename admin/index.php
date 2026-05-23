@@ -9,7 +9,7 @@ generarTokenCSRF();
 if (isset($_REQUEST['u']) && !empty($_REQUEST['u'])) {
     // Validar token CSRF
     if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
-        header("Location: Errors/errorlogin.php");
+        header("Location: error_handler.php?t=captcha");
         exit;
     }
     

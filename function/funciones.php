@@ -33,10 +33,10 @@ function login_Index($u, $p){
             
             header("Location: inicio.php");
         } else {
-            header("Location: Errors/errorlogin1.php");
+            header("Location: error_handler.php?t=login");
         }
     } else {
-        header("Location: Errors/errorlogin1.php");
+        header("Location: error_handler.php?t=login");
     }
     
     mysqli_stmt_close($stmt);
@@ -51,7 +51,7 @@ function registrer_Index($u, $p, $n, $cc, $t, $g){
     $max_size = 5 * 1024 * 1024; // 5MB
     
     if (!isset($_FILES['photo']) || $_FILES['photo']['error'] !== UPLOAD_ERR_OK) {
-        header("Location: Errors/errorlogin.php");
+        header("Location: error_handler.php?t=admin");
         return;
     }
     
@@ -61,12 +61,12 @@ function registrer_Index($u, $p, $n, $cc, $t, $g){
     $file_ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
     
     if (!in_array($file_type, $allowed_types) || !in_array($file_ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-        header("Location: Errors/errorlogin.php");
+        header("Location: error_handler.php?t=admin");
         return;
     }
     
     if ($file_size > $max_size) {
-        header("Location: Errors/errorlogin.php");
+        header("Location: error_handler.php?t=admin");
         return;
     }
     
@@ -106,9 +106,9 @@ function registrer_Index($u, $p, $n, $cc, $t, $g){
     mysqli_stmt_execute($check_email);
     
     if (mysqli_num_rows(mysqli_stmt_get_result($check_email)) > 0) {
-        header("Location: Errors/errorlogin3.php");
+        header("Location: error_handler.php?t=existe");
     } else {
-        header("Location: Errors/errorlogin2.php");
+        header("Location: error_handler.php?t=registro");
     }
     
     mysqli_stmt_close($check_email);
