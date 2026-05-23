@@ -1,9 +1,33 @@
-* {
-  margin: 0px;
+/* ========================================
+   VARIABLES CSS - Personalización global
+   ======================================== */
+:root {
+  --color-primary: #0a9ede;
+  --color-primary-dark: #063f74;
+  --color-secondary: #ffffff;
+  --color-text: #000000;
+  --color-bg-overlay: rgba(6, 63, 116, 0.5);
+  --color-bg-light: rgba(255, 255, 255, 0.5);
+  --color-bg-dark: rgba(0, 0, 0, 0.5);
+  --color-accent: chartreuse;
+  --color-danger: #ff0000;
+  --border-radius: 20px;
+  --transition-speed: 300ms;
+  --font-primary: "Times New Roman", Times, serif;
+  --font-secondary: helvetica, arial, sans-serif;
+  --shadow-sm: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+}
 
+/* ========================================
+   RESET Y ESTILOS BASE
+   ======================================== */
+* {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
   text-decoration: none;
-  font-family: "Times New Roman", Times, serif;
+  font-family: var(--font-primary);
 }
 
 body {
@@ -13,8 +37,12 @@ body {
   background-repeat: no-repeat;
   background-position: center;
   cursor: pointer;
+  min-height: 100vh;
 }
 
+/* ========================================
+   LAYOUT PRINCIPAL
+   ======================================== */
 main {
   width: 100%;
   padding: 20px;
@@ -22,12 +50,19 @@ main {
   margin-top: 100px;
 }
 
+/* ========================================
+   BOTONES GENERALES
+   ======================================== */
 button {
   border-radius: 40px;
   border: 1px solid transparent;
   background-color: transparent;
+  cursor: pointer;
 }
 
+/* ========================================
+   HEADER PEGAJOSO
+   ======================================== */
 .pegajoso img {
   justify-content: flex-start;
   width: 60px;
@@ -37,15 +72,21 @@ button {
   display: flex;
   text-align: left;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--color-secondary);
 }
 
+/* ========================================
+   TÍTULOS
+   ======================================== */
 h1 {
   text-align: center;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--color-secondary);
 }
 
+/* ========================================
+   CONTENEDORES DE LOGIN/REGISTRO
+   ======================================== */
 .contenedor__todo {
   width: 100%;
   max-width: 800px;
@@ -59,14 +100,15 @@ h1 {
   padding: 10px 20px;
   display: flex;
   justify-content: center;
-  backdrop-filter: blur (8px);
-  background-color: rgba(6, 63, 116, 0.5);
+  backdrop-filter: blur(8px);
+  background-color: var(--color-bg-overlay);
+  border-radius: var(--border-radius);
 }
 
 .caja_trasera div {
   margin: 100px 40px;
-  color: white;
-  transition: all 500ms;
+  color: var(--color-secondary);
+  transition: all 500ms ease;
 }
 
 .caja_trasera div p,
@@ -81,21 +123,24 @@ h1 {
 
 .caja_trasera button {
   padding: 10px 40px;
-  border: 2px solid white;
+  border: 2px solid var(--color-secondary);
   background: transparent;
   font-size: 20px;
   font-weight: 600;
   cursor: pointer;
-  color: white;
+  color: var(--color-secondary);
   outline: none;
-  transform: all 300ms;
+  transition: all var(--transition-speed) ease;
 }
 
 .caja_trasera button:hover {
-  background-color: white;
-  color: rgb(0, 0, 0);
+  background-color: var(--color-secondary);
+  color: var(--color-text);
 }
 
+/* ========================================
+   FORMULARIOS LOGIN/REGISTRO
+   ======================================== */
 .contenedor_login_register {
   display: flex;
   align-items: center;
@@ -105,34 +150,25 @@ h1 {
   top: -185px;
   left: 10px;
   transition: left 500ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  text-decoration: double;
 }
 
 .contenedor_login_register form {
   width: 100%;
   padding: 80px 20px;
-  background: white;
+  background: var(--color-secondary);
   position: absolute;
-  border-radius: 20px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
 }
 
 .contenedor_login_register form h2 {
   font-size: 30px;
   text-align: center;
   margin-bottom: 20px;
-  color: rgb(0, 139, 246);
+  color: var(--color-primary);
 }
 
-.contenedor_login_register form input {
-  width: 100%;
-  margin-top: 20px;
-  padding: 10px;
-  border: none;
-  background: rgb(218, 218, 218);
-  font-size: 16px;
-  outline: none;
-}
-
+.contenedor_login_register form input,
 .contenedor_login_register form select {
   width: 100%;
   margin-top: 20px;
@@ -141,17 +177,32 @@ h1 {
   background: rgb(218, 218, 218);
   font-size: 16px;
   outline: none;
+  border-radius: 4px;
+  transition: all var(--transition-speed) ease;
 }
 
+.contenedor_login_register form input:focus,
+.contenedor_login_register form select:focus {
+  background: rgb(200, 200, 200);
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
 
 .contenedor_login_register form button {
   padding: 10px 40px;
   margin-top: 40px;
   border: none;
   font-size: 20px;
-  background: rgb(10, 158, 222);
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-secondary);
   cursor: pointer;
+  border-radius: var(--border-radius);
+  transition: all var(--transition-speed) ease;
+}
+
+.contenedor_login_register form button:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .formulario_login {
@@ -193,8 +244,11 @@ h1 {
   }
 }
 
+/* ========================================
+   LAYOUT FLEXIBLE (contenedor_flex)
+   ======================================== */
 .contenedor_flex {
-  font-family: helvetica, arial, sans-serif;
+  font-family: var(--font-secondary);
   height: 100vh;
   width: 100vw;
   display: flex;
@@ -215,8 +269,14 @@ h1 {
   display: block;
   width: 80%;
   height: 80%;
-  border: 1px solid rgb(0, 0, 0);
+  border: 1px solid var(--color-text);
   object-fit: cover;
+  border-radius: var(--border-radius);
+  transition: transform var(--transition-speed) ease;
+}
+
+.left-side img:hover {
+  transform: scale(1.02);
 }
 
 .right-side {
@@ -234,14 +294,17 @@ h1 {
   text-align: justify;
 }
 
+/* ========================================
+   HEADER PEGAJOSO (sticky)
+   ======================================== */
 .pegajoso {
   height: 55px;
   position: sticky;
   top: 0;
-  background-color: rgb(0, 0, 0, 0.5);
+  background-color: var(--color-bg-dark);
   text-transform: uppercase;
   text-align: right;
-  color: rgb(255, 255, 255);
+  color: var(--color-secondary);
   padding: 15px;
   display: flex;
   flex-wrap: wrap;
@@ -249,48 +312,47 @@ h1 {
   justify-content: center;
   align-items: center;
   margin-bottom: 15px;
-  z-index: 2;
+  z-index: 100;
+  backdrop-filter: blur(5px);
 }
 
+/* ========================================
+   BOTONES DE ACCIÓN (editar, cerrar, crear)
+   ======================================== */
 .editar,
-.cerrar {
-  border-radius: 20px;
-  border: 1px solid rgb(0, 0, 0);
+.cerrar,
+.crear {
+  border-radius: var(--border-radius);
+  border: 1px solid var(--color-text);
   padding: 10px 50px;
-  color: rgb(0, 0, 0);
+  color: var(--color-text);
   text-decoration: none;
-  margin-top: 50px;
   background-color: aliceblue;
-  display: inline;
+  display: inline-block;
+  transition: all var(--transition-speed) ease;
+  font-weight: 600;
+}
+
+.editar:hover,
+.crear:hover {
+  color: var(--color-secondary);
+  background-color: var(--color-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.cerrar:hover {
+  color: var(--color-secondary);
+  background-color: var(--color-danger);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .crear {
   width: 80%;
   display: block;
-  border-radius: 20px;
-  border: 1px solid rgb(0, 0, 0);
-  padding: 10px 50px;
-  color: rgb(0, 0, 0);
-  text-decoration: none;
-  margin: auto;
-  margin-top: 50px;
-  background-color: aliceblue;
-  justify-content: center;
-}
-
-.crear:hover {
-  color: rgb(255, 255, 255);
-  background-color: chartreuse;
-}
-
-.editar:hover {
-  color: rgb(255, 255, 255);
-  background-color: chartreuse;
-}
-
-.cerrar:hover {
-  color: rgb(255, 255, 255);
-  background-color: rgb(255, 0, 0);
+  margin: 50px auto;
+  text-align: center;
 }
 
 .container2 {
@@ -325,79 +387,92 @@ h1 {
   order: 3;
 }
 
+/* ========================================
+   FORMULARIOS ESTILIZADOS (formu)
+   ======================================== */
 .formu-input {
-  background-color: rgba(6, 63, 116, 0.5);
-  color: #fff;
+  background-color: var(--color-bg-overlay);
+  color: var(--color-secondary);
   font-size: 15px;
   width: 100%;
   padding: 7px !important;
   margin: auto !important;
   border: none;
-  border-bottom: 3px solid rgb(10, 158, 222);
+  border-bottom: 3px solid var(--color-primary);
   text-align: center !important;
   margin-bottom: 20px !important;
+  transition: all var(--transition-speed) ease;
 }
-
 
 .formu-input:focus {
   background: linear-gradient(to bottom, transparent, #222);
   outline: none;
-  border-bottom: 3px solid rgb(10, 158, 222);
+  border-bottom: 3px solid var(--color-primary);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .formu-input::placeholder {
-  color: #ffffff;
+  color: var(--color-secondary);
   text-align: center;
 }
 
 .formu_img img {
   width: 60%;
   margin: auto;
-  border: radius;
+  border-radius: var(--border-radius);
   min-width: 300px;
   max-width: 200px;
 }
 
 .formu-button {
-  background-color: rgba(6, 63, 116, 0.5);
-  color: #fff;
-  border: 2px solid white;
+  background-color: var(--color-bg-overlay);
+  color: var(--color-secondary);
+  border: 2px solid var(--color-secondary);
   padding: 12px;
   width: 80%;
   margin: 10px;
   text-transform: uppercase;
   font-size: 18px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
 }
 
 .formu-button:hover {
-  background: #feffff;
-  border-bottom: black;
-  color: black;
-  padding: 12px;
+  background: var(--color-secondary);
+  color: var(--color-text);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .formu-button:focus {
-  background: #ffffff;
+  background: var(--color-secondary);
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .label1 {
   text-align: right;
   border: none;
-  color: #fff;
+  color: var(--color-secondary);
   font-size: 20px;
   order: 1;
 }
 
+/* ========================================
+   MENÚ LATERAL
+   ======================================== */
 .menu {
   padding-left: 30px;
   margin: 100px auto;
-  width: 30%;
-  float: left;
   width: 125px;
   text-align: right;
   display: inline;
 }
 
+/* ========================================
+   CONTENIDO DE PÁGINA Y PRODUCTOS
+   ======================================== */
 .page-content {
   display: flex;
   flex-wrap: wrap;
@@ -409,23 +484,28 @@ h1 {
   margin: 15px;
   padding: 2px 16px;
   position: relative;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
-  background-color: rgb(255, 255, 255, .2);
+  box-shadow: var(--shadow-sm);
+  background-color: var(--color-bg-light);
+  border-radius: var(--border-radius);
+  transition: all var(--transition-speed) ease;
 }
 
 .product-container:hover {
-  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
-  background-color: #feffff;
+  box-shadow: var(--shadow-md);
+  background-color: var(--color-secondary);
+  transform: translateY(-5px);
 }
 
 .product-container img {
   width: 300px;
   height: 300px;
+  object-fit: cover;
+  border-radius: var(--border-radius);
+  transition: transform var(--transition-speed) ease;
 }
 
 .product-container img:hover {
-  width: 310px;
-  height: 310px;
+  transform: scale(1.03);
 }
 
 .product-container h1 {
@@ -433,11 +513,10 @@ h1 {
   margin-left: 15px;
 }
 
-
-
+/* ========================================
+   TABLAS DE DATOS
+   ======================================== */
 .tabla {
-
-
   padding-right: 50px;
   margin: 100px auto;
   width: 80%;
@@ -447,62 +526,79 @@ h1 {
 }
 
 table {
-  background-color: rgb(255, 255, 255, .5);
+  background-color: var(--color-bg-light);
   text-align: left;
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 100px;
   table-layout: fixed;
+  border-radius: var(--border-radius);
+  overflow: hidden;
 }
 
 td,
 th {
   padding: 12px;
-  text-decoration: solid;
-
+  word-wrap: break-word;
 }
 
 thead {
-  background-color: rgb(0, 139, 246);
-  color: rgb(255, 255, 255);
-  border-bottom: solid 5px white;
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+  border-bottom: solid 5px var(--color-secondary);
 }
 
 tr:nth-child(even) {
-  background-color: rgb(105, 105, 105, .5);
+  background-color: rgba(105, 105, 105, 0.5);
 }
 
 table tbody tr:hover {
-  background-color: rgba(255, 255, 255, 0.5);
-  color: rgb(0, 0, 0);
+  background-color: var(--color-bg-light);
+  color: var(--color-text);
 }
 
 table tbody td:hover {
   background-color: rgba(255, 255, 255, 0.8);
-  color: #000;
+  color: var(--color-text);
 }
 
+/* ========================================
+   ENLACES GENERALES
+   ======================================== */
 a {
-  color: blue;
-  text-decoration: solid;
+  color: var(--color-primary);
+  text-decoration: underline;
+  transition: color var(--transition-speed) ease;
 }
 
+a:hover {
+  color: var(--color-primary-dark);
+}
+
+/* ========================================
+   BOTÓN VOLVER
+   ======================================== */
 .volver {
   font-size: 3vh;
-  border-radius: 20px;
-  border: 1px solid rgb(0, 0, 0);
-  padding: 10px 10px;
-  color: rgb(0, 0, 0);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--color-text);
+  padding: 10px;
+  color: var(--color-text);
   text-decoration: none;
   margin-top: 10px;
   background-color: aliceblue;
   display: inline-flex;
   width: 30vh;
+  justify-content: center;
+  align-items: center;
+  transition: all var(--transition-speed) ease;
 }
 
 .volver:hover {
-  color: rgb(255, 255, 255);
-  background-color: chartreuse;
+  color: var(--color-secondary);
+  background-color: var(--color-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 @media all and (max-width: 1200px) {
@@ -1051,44 +1147,58 @@ footer {
   padding: 20px;
 }
 
-.ft{
-  width: 20vh;
-    bottom: 0;
+/* ========================================
+   FOOTER
+   ======================================== */
+.ft {
   width: 100%;
-  /* background-color: #f5f5f5; */
+  bottom: 0;
   text-align: center;
   padding: 20px;
+  background-color: var(--color-bg-dark);
+  color: var(--color-secondary);
 }
 
-.alec{
-  background-color: red;
-  color: #feffff;
+.alec {
+  background-color: var(--color-danger);
+  color: var(--color-secondary);
   width: 40px;
   border-radius: 15px;
   text-align: center;
-  
-}
-.ender{
-  text-transform: uppercase;
-  text-decoration: none;
-  color: #000;
+  display: inline-block;
+  padding: 5px;
+  transition: all var(--transition-speed) ease;
 }
 
+.alec:hover {
+  transform: scale(1.1);
+  box-shadow: var(--shadow-md);
+}
+
+.ender {
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.ender:hover {
+  color: var(--color-primary);
+}
+
+/* ========================================
+   CONTENEDORES PRINCIPALES
+   ======================================== */
 .contenedor-principal {
   display: flex;
   flex-wrap: wrap;
   margin-top: -30px;
+  gap: 20px;
 }
 
-.contenedor-izquierdo {
-  box-sizing: border-box; 
-
-  width: 50%;
-  padding: 20px;
-}
-
+.contenedor-izquierdo,
 .contenedor-derecho {
-  box-sizing: border-box; 
+  box-sizing: border-box;
   width: 50%;
   padding: 20px;
 }
@@ -1099,8 +1209,26 @@ footer {
     width: 100%;
   }
 }
-.text_rec{
+
+/* ========================================
+   TEXTOS Y ELEMENTOS VARIOS
+   ======================================== */
+.text_rec {
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
   font-size: 15px;
   margin: 10px;
+}
+
+/* ========================================
+   ACCESIBILIDAD - Reduced Motion
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
