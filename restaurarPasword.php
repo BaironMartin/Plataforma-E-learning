@@ -1,8 +1,17 @@
 <?php
 
 include('includes/conectar.php');
+include('includes/csrf.php');
+
+session_start();
 
 if (isset($_REQUEST['rec'])) {
+    // Validar token CSRF
+    if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
+        header("Location: Errors/errorlogin.php");
+        exit;
+    }
+    
     $p1 = $_REQUEST['security_question1'];
     $p2 = $_REQUEST['security_question2'];
     $r1 = $_REQUEST['respuesta1'];
@@ -11,35 +20,49 @@ if (isset($_REQUEST['rec'])) {
     $pas1 = $_REQUEST['pass1'];
     $pas2 = $_REQUEST['pass2'];
 
+    // Sanitizar email
+    $mail = filter_var($mail, FILTER_SANITIZE_EMAIL);
 
-    $sql = "SELECT * FROM `seguridad` WHERE user ='" . $mail . "'";
-    $resultado = mysqli_query($cont, $sql);
+    // Prepared statement para prevenir SQL injection
+    $sql = "SELECT * FROM `seguridad` WHERE user=?";
+    $stmt = mysqli_prepare($cont, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $mail);
+    mysqli_stmt_execute($stmt);
+    $resultado = mysqli_stmt_get_result($stmt);
     $row = mysqli_num_rows($resultado);
     $array = mysqli_fetch_assoc($resultado);
-
-
+    mysqli_stmt_close($stmt);
 
     if ($row != 0) {
         if (($p1 == $array['p1']) && ($r1 == $array['r1']) && ($p2 == $array['p2']) && ($r2 == $array['r2'])) {
 
             if ($pas1 == $pas2) {
-                $p = hash('sha512', $pas1);
-                mysqli_query($cont, "UPDATE usuarios SET Clave = '$p' WHERE Email ='" . $mail . "'");
+                // Hash seguro con bcrypt
+                $p = password_hash($pas1, PASSWORD_BCRYPT);
+                
+                // Prepared statement para actualizar
+                $update_sql = "UPDATE usuarios SET Clave=? WHERE Email=?";
+                $update_stmt = mysqli_prepare($cont, $update_sql);
+                mysqli_stmt_bind_param($update_stmt, "ss", $p, $mail);
+                mysqli_stmt_execute($update_stmt);
+                mysqli_stmt_close($update_stmt);
+                
                 header("Location: index.php");
+                exit;
             } else {
-                echo '<script language="javascript">alert("La contrasenio no cioncide");</script>';
+                echo '<script language="javascript">alert("La contraseña no coincide");</script>';
             }
         } else {
             header("Location:Errors/errorlogin5.php");
+            exit;
         }
     } else {
         header("Location:Errors/errorlogin4.php");
+        exit;
     }
 }
 
 include('includes/encabezado.php');
-
-
 
 ?>
 
@@ -58,6 +81,7 @@ include('includes/encabezado.php');
     </h3>"
 
     <form action="restaurarPasword.php" method="post" class="formu">
+        <?php echo campoTokenCSRF(); ?>
 
         <div class="contenedor-principal">
             <div class="contenedor-izquierdo">

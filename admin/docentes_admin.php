@@ -1,38 +1,60 @@
 <?php
 
 include('../includes/conectar.php');
-
+include('../includes/csrf.php');
 
 session_start();
+
+// Configuración de sesión segura
 if (!isset($_SESSION['user_admin'])) {
     header("location:index.php");
+    exit;
 } else {
     if ((time() - $_SESSION['time']) > 1800) {
         session_destroy();
         header("location:index.php");
+        exit;
     }
 }
 
 if (isset($_REQUEST['cerrar'])) {
     session_destroy();
     header("location:index.php");
+    exit;
 }
 
-
-$query = mysqli_query($cont, ('SELECT * FROM `usuarios` WHERE tipo ="docente"'));
+// Consulta segura para obtener docentes
+$stmt = mysqli_prepare($cont, "SELECT * FROM usuarios WHERE tipo = ?");
+$tipo_docente = "docente";
+mysqli_stmt_bind_param($stmt, "s", $tipo_docente);
+mysqli_stmt_execute($stmt);
+$query = mysqli_stmt_get_result($stmt);
 $coun = mysqli_num_rows($query);
-$content = mysqli_fetch_assoc($query);
 
-
-$sql = "SELECT * FROM admin_p WHERE email ='" . $_SESSION['user_admin'] . "'";
-$resultado = mysqli_query($cont, $sql);
+$sql = "SELECT * FROM admin_p WHERE email = ?";
+$stmt2 = mysqli_prepare($cont, $sql);
+mysqli_stmt_bind_param($stmt2, "s", $_SESSION['user_admin']);
+mysqli_stmt_execute($stmt2);
+$resultado = mysqli_stmt_get_result($stmt2);
 $a = mysqli_fetch_assoc($resultado);
 
+// Eliminar docente con verificación CSRF
 if (isset($_REQUEST['e'])) {
-    echo $_REQUEST['e'];
-    $sql2 = ("DELETE FROM usuarios WHERE Email= '" . $_REQUEST['e'] . "'");
-    mysqli_query($cont, $sql2);
+    // Verificar token CSRF
+    if (!verificarTokenCSRF($_POST['csrf_token'] ?? '')) {
+        $_SESSION['error'] = "Token CSRF inválido";
+        header("location:docentes_admin.php");
+        exit;
+    }
+    
+    $email_delete = $_REQUEST['e'];
+    $stmt3 = mysqli_prepare($cont, "DELETE FROM usuarios WHERE Email = ?");
+    mysqli_stmt_bind_param($stmt3, "s", $email_delete);
+    mysqli_stmt_execute($stmt3);
+    mysqli_stmt_close($stmt3);
+    
     header("location:docentes_admin.php");
+    exit;
 }
 
 include('includes/header.php');
@@ -64,39 +86,37 @@ include('includes/menu.php');
                 </thead>
                 <tbody>
                     <?php
-                    do {
+                    while ($content = mysqli_fetch_assoc($query)) {
                         echo "<tr>";
-                            echo "<td>".$content['Nombre']."</td>";
-                            echo "<td>".$content['Email']."</td>";
-                            echo"<th ><a class='btn red white-text' href='docentes_admin.php?e=".$content['Email']."'>Eliminar</a></th>";
-                            echo"<th ><a class='btn blue white-text' href='docente_clase.php?clave=".$content['Email']."' >Ver Materias</a></th>";
+                        echo "<td>" . htmlspecialchars($content['Nombre']) . "</td>";
+                        echo "<td>" . htmlspecialchars($content['Email']) . "</td>";
+                        
+                        // Formulario de eliminación con CSRF
+                        echo "<th><form method='POST' action='docentes_admin.php' style='display:inline;' onsubmit='return confirm(\"¿Está seguro de eliminar este docente?\");'>";
+                        echo campoTokenCSRF();
+                        echo "<input type='hidden' name='e' value='" . htmlspecialchars($content['Email']) . "'>";
+                        echo "<button type='submit' class='btn red white-text'>Eliminar</button>";
+                        echo "</form></th>";
+                        
+                        echo "<th><a class='btn blue white-text' href='docente_clase.php?clave=" . urlencode($content['Email']) . "' >Ver Materias</a></th>";
                         echo "</tr>";
-                    } while ($content = mysqli_fetch_assoc($query));
+                    }
                     ?>
-
+                </tbody>
                 </tbody>
             </table>
 
-
-
-
         <?php
         } else {
+            echo "<p class='center'>No hay docentes registrados</p>";
         }
-
         ?>
-
-
 
     </div>
 </div>
 
-
-
-
-
-
 <script src="js/buscador.js"></script>
+
 <?php
 mysqli_free_result($resultado);
 mysqli_free_result($query);

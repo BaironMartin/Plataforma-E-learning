@@ -1,7 +1,7 @@
 <?php
 
 include('../includes/conectar.php');
-
+require_once('../includes/upload_security.php');
 
 session_start();
 if (!isset($_SESSION['user_admin'])) {
@@ -18,150 +18,73 @@ if (isset($_REQUEST['cerrar'])) {
     header("location:index.php");
 }
 
-
-
-
-$sql = "SELECT * FROM admin_p WHERE email ='" . $_SESSION['user_admin'] . "'";
-$resultado = mysqli_query($cont, $sql);
+// Prepared statement para consulta de admin
+$stmt = $cont->prepare("SELECT * FROM admin_p WHERE email = ?");
+$stmt->bind_param("s", $_SESSION['user_admin']);
+$stmt->execute();
+$resultado = $stmt->get_result();
 $a = mysqli_fetch_assoc($resultado);
+$stmt->close();
 
 if (isset($_REQUEST['nom']) && !empty($_REQUEST['nom'])) {
-    $n = $_REQUEST['nom'];
-    $ap = $_REQUEST['ape'];
-    $mail = $_REQUEST['mail'];
+    // Validar token CSRF
+    if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
+        header("Location: errors/errorlogin.php");
+        exit();
+    }
+    
+    $n = trim($_REQUEST['nom']);
+    $ap = trim($_REQUEST['ape']);
+    $mail = filter_input(INPUT_POST, 'mail', FILTER_VALIDATE_EMAIL);
     $pas = $_REQUEST['pass'];
-    $car = $_REQUEST['car'];
-    $cel = $_REQUEST['cel'];
-    $edad = $_REQUEST['edad'];
-    $fp = $_FILES['perfil']['name'];
-    $fb = $_FILES['bane']['name'];
+    $car = trim($_REQUEST['car']);
+    $cel = trim($_REQUEST['cel']);
+    $edad = intval($_REQUEST['edad']);
+    
+    // Validaciones básicas
+    if (!$mail || empty($pas) || $edad <= 0) {
+        header("Location: errors/errorlogin.php");
+        exit();
+    }
+    
+    // Validar archivos subidos
+    $uploadPerfil = validarArchivo($_FILES['perfil'], ['jpg', 'jpeg', 'png', 'gif'], 5242880);
+    $uploadBane = validarArchivo($_FILES['bane'], ['jpg', 'jpeg', 'png', 'gif'], 5242880);
+    
+    if (!$uploadPerfil['success'] || !$uploadBane['success']) {
+        header("Location: errors/errorlogin.php");
+        exit();
+    }
+    
+    $fp = $uploadPerfil['nombre_seguro'];
+    $fb = $uploadBane['nombre_seguro'];
 
-
-    $pas = hash('sha512', $pas);
-    $id = $mail;
-    $sql = "SELECT* FROM admin_p WHERE email='$id'";
-    $resultado = mysqli_query($cont, $sql);
-    if (mysqli_num_rows($resultado) == 0) {
-
-        mysqli_query($cont, "INSERT INTO admin_p VALUE (null,'$n','$ap','$mail','$pas','$car','$cel','$edad','$fp','$fb')");
-        move_uploaded_file($_FILES['perfil']['tmp_name'], "archivos/perfil/" . $n . $fp);
-        move_uploaded_file($_FILES['bane']['tmp_name'], "archivos/baner/" . $n . $fb);
-        header("Location: inicio_admin.php");
+    // Hash seguro con bcrypt
+    $pas_hash = password_hash($pas, PASSWORD_BCRYPT);
+    
+    // Verificar si el email ya existe
+    $stmt_check = $cont->prepare("SELECT email FROM admin_p WHERE email = ?");
+    $stmt_check->bind_param("s", $mail);
+    $stmt_check->execute();
+    $result_check = $stmt_check->get_result();
+    
+    if (mysqli_num_rows($result_check) == 0) {
+        // Insertar con prepared statement
+        $stmt_insert = $cont->prepare("INSERT INTO admin_p VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt_insert->bind_param("ssssssiss", $n, $ap, $mail, $pas_hash, $car, $cel, $edad, $fp, $fb);
+        
+        if ($stmt_insert->execute()) {
+            // Mover archivos con nombres seguros
+            move_uploaded_file($_FILES['perfil']['tmp_name'], "archivos/perfil/" . $fp);
+            move_uploaded_file($_FILES['bane']['tmp_name'], "archivos/baner/" . $fb);
+            header("Location: inicio_admin.php?registro=exitoso");
+        } else {
+            header("Location: errors/errorlogin.php");
+        }
+        $stmt_insert->close();
     } else {
-        echo "M.toast({html: 'I am a toast!'})";
         header("Location: errors/errorlogin2.php");
     }
-
-
-    mysqli_free_result($resultado);
-    mysqli_close($cont);
+    
+    $stmt_check->close();
 }
-
-
-
-include('includes/header.php');
-include('includes/menu.php');
-
-?>
-
-
-
-
-<div class="container">
-    <h1 class="center green-text Underline">Registro de Directivos</h1>
-    <div class="row green-text ">
-        <form class="col s12" action="inicio_admin.php" enctype="multipart/form-data" method="post">
-            <div class="row">
-                <div class="input-field col s6">
-                    <i class="material-icons prefix">account_circle</i>
-                    <input id="first_name" type="text" class="validate" name="nom">
-                    <label for="first_name">Nombres</label>
-                </div>
-                <div class="input-field col s6">
-                    <i class="material-icons prefix">account_circle</i>
-                    <input id="last_name" type="text" class="validate" name="ape">
-                    <label for="last_name">Apellidos</label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="input-field col s12">
-                    <i class="material-icons prefix">email</i>
-                    <input id="email" type="email" class="validate" name="mail">
-                    <label for="email">Email</label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="input-field col s12">
-                    <i class="material-icons prefix">password</i>
-                    <input id="password" type="password" class="validate" name="pass">
-                    <label for="password">Password</label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="input-field col s12">
-                    <i class="material-icons prefix">business</i>
-                    <input id="cargo" type="text" class="validate" name='car'>
-                    <label for="cargo">Cargo</label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="input-field col s12">
-                    <i class="material-icons prefix">phone</i>
-                    <input id="icon_telephone" type="tel" class="validate" name="cel">
-                    <label for="icon_telephone">Telefono</label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="input-field col s12">
-                    <i class="material-icons prefix">cake</i>
-                    <input id="age" type="number" class="validate" name="edad">
-                    <label for="age">Edad</label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="file-field input-field">
-                    <div class="green btn">
-                        <span>Foto de Perfil</span>
-                        <input type="file" name="perfil">
-                    </div>
-                    <div class="file-path-wrapper">
-                        <input class="file-path validate" name='perfil' type="text">
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="file-field input-field">
-                    <div class="btn green">
-                        <span>Baner</span>
-                        <input type="file" name='bane'>
-                    </div>
-                    <div class="file-path-wrapper">
-                        <input class="file-path validate" name='bane' type="text">
-                    </div>
-                </div>
-            </div>
-            <div class=" center-align">
-                <button class="btn waves-effect waves-light green" type="submit" name="action">Submit
-                    <i class="material-icons right">send</i>
-                </button>
-            </div>
-
-        </form>
-    </div>
-</div>
-
-
-
-
-
-
-
-
-<?php
-mysqli_free_result($resultado);
-mysqli_close($cont);
-include('includes/footer.php')
-
-?>
-

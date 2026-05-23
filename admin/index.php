@@ -1,28 +1,59 @@
 <?php
 session_start();
 include('../includes/conectar.php');
+include('../includes/csrf.php');
+
+// Regenerar token CSRF
+generarTokenCSRF();
 
 if (isset($_REQUEST['u']) && !empty($_REQUEST['u'])) {
+    // Validar token CSRF
+    if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
+        header("Location: Errors/errorlogin.php");
+        exit;
+    }
+    
     $u = $_POST['u'];
     $p = $_POST['p'];
 
-    $p= hash('sha512',$p);
-    $sql = "SELECT * FROM admin_p WHERE email='$u' AND contrasenia='$p'";
-    $resultado = mysqli_query($cont, $sql);
-    if (mysqli_num_rows($resultado) == 1) {
-        $_SESSION['user_admin'] = $u;
-        $_SESSION['time'] = time();
-        header("Location: inicio_admin.php");
+    // Prepared statement para prevenir SQL injection
+    $sql = "SELECT * FROM admin_p WHERE email=?";
+    $stmt = mysqli_prepare($cont, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $u);
+    mysqli_stmt_execute($stmt);
+    $resultado = mysqli_stmt_get_result($stmt);
     
+    if (mysqli_num_rows($resultado) == 1) {
+        $admin = mysqli_fetch_assoc($resultado);
+        
+        // Verificar password con bcrypt o SHA-512 legacy
+        if (password_verify($p, $admin['contrasenia']) || hash('sha512', $p) == $admin['contrasenia']) {
+            // Regenerar ID de sesión
+            session_regenerate_id(true);
+            $_SESSION['user_admin'] = $u;
+            $_SESSION['time'] = time();
+            
+            // Migrar a bcrypt si estaba usando SHA-512
+            if (hash('sha512', $p) == $admin['contrasenia']) {
+                $new_hash = password_hash($p, PASSWORD_BCRYPT);
+                $update_stmt = mysqli_prepare($cont, "UPDATE admin_p SET contrasenia=? WHERE email=?");
+                mysqli_stmt_bind_param($update_stmt, "ss", $new_hash, $u);
+                mysqli_stmt_execute($update_stmt);
+                mysqli_stmt_close($update_stmt);
+            }
+            
+            header("Location: inicio_admin.php");
+        } else {
+            header("Location: errors/errorlogin1.php");
+        }
     } else {
         header("Location: errors/errorlogin1.php");
-    
     }
+    
+    mysqli_stmt_close($stmt);
     mysqli_free_result($resultado);
     mysqli_close($cont);
-    
 }
-
 
 ?>
 <!DOCTYPE html>
@@ -69,6 +100,7 @@ if (isset($_REQUEST['u']) && !empty($_REQUEST['u'])) {
             <div class=" col s12 m6">
                 <br><br><br><br>
                 <form action="index.php" method="post" class="col s12" autocomplete="">
+                    <?php echo campoTokenCSRF(); ?>
                     <div class="row">
                         <div class="row">
                             <div class="input-field col s12">

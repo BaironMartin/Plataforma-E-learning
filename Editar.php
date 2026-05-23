@@ -2,10 +2,13 @@
 
 include('includes/conectar.php');
 include('includes/secionesUser.php');
+include('includes/csrf.php');
+include('includes/upload_security.php');
 
 if (isset($_REQUEST['cerrar'])) {
     session_destroy();
     header("location:index.php");
+    exit;
 }
 
 $varsession = $_SESSION['user'];
@@ -16,21 +19,25 @@ if ($varsession == null || $varsession == '') {
 }
 
 
-$sql = "SELECT * FROM usuarios WHERE Email ='" . $_SESSION['user'] . "'";
-$resultado = mysqli_query($cont, $sql);
+$sql = "SELECT * FROM usuarios WHERE Email=?";
+$stmt = mysqli_prepare($cont, $sql);
+mysqli_stmt_bind_param($stmt, "s", $_SESSION['user']);
+mysqli_stmt_execute($stmt);
+$resultado = mysqli_stmt_get_result($stmt);
 $a = mysqli_fetch_assoc($resultado);
-
-if (isset($_REQUEST['cerrar'])) {
-    session_destroy();
-    header("location:index.php");
-}
+mysqli_stmt_close($stmt);
 
 if (isset($_REQUEST['pass']) && !empty($_REQUEST['pass'])) {
-
+    // Validar token CSRF
+    if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
+        header("location:inicio.php");
+        exit;
+    }
 
     $p = $_REQUEST['pass'];
-    $p = hash('sha512', $p);
-    if ($p == $a['Clave']) {
+    
+    // Verificar password actual
+    if (password_verify($p, $a['Clave']) || hash('sha512', $p) == $a['Clave']) {
 
         $u = $_REQUEST['user'];
         $n = $_REQUEST['nombre'];
@@ -44,27 +51,41 @@ if (isset($_REQUEST['pass']) && !empty($_REQUEST['pass'])) {
         if ($img == "") {
             $f = $_REQUEST['fotoa'];
         } else {
-            $f = $img;
-            move_uploaded_file($_FILES['photo']['tmp_name'], "archivos/" . $u . $f);
+            // Validar y subir archivo de forma segura
+            $upload_result = subirArchivoSeguro(
+                $_FILES['photo'], 
+                "archivos/", 
+                $u,
+                ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+                5 * 1024 * 1024
+            );
+            
+            if ($upload_result['success']) {
+                $f = $upload_result['filename'];
+            } else {
+                header("location:inicio.php?error=" . urlencode($upload_result['error']));
+                exit;
+            }
         }
 
 
-        $sql = ("UPDATE usuarios SET Nombre='$n',Foto='$f', cc='$cc',Tipo='$t', baner = '$bn' WHERE Email='" . $_SESSION['user'] . "'");
-        mysqli_query($cont, $sql);
+        $sql = "UPDATE usuarios SET Nombre=?, Foto=?, cc=?, Tipo=?, baner=? WHERE Email=?";
+        $update_stmt = mysqli_prepare($cont, $sql);
+        mysqli_stmt_bind_param($update_stmt, "ssssss", $n, $f, $cc, $t, $bn, $_SESSION['user']);
+        mysqli_query($cont, $update_stmt);
+        mysqli_stmt_close($update_stmt);
+        
         header("location:inicio.php");
+        exit;
 
-        mysqli_free_result($resultado);
-        mysqli_close($cont);
     } else {
         header("location:inicio.php");
+        exit;
     }
 }
-$decr_pw = hash("sha512", $a['Clave']);
 
-$sql = ("SELECT * FROM `seguridad` WHERE user ='". $_SESSION['user']."'");
-$res=mysqli_query($cont, $sql);
-$nm=mysqli_num_rows($res);
-
+mysqli_free_result($resultado);
+mysqli_close($cont);
 
 include('includes/encabezado.php')
 ?>
@@ -88,46 +109,47 @@ include('includes/encabezado.php')
         ?>
 
         <form action="Editar.php" method="post" enctype="multipart/form-data" class="formu">
+            <?php echo campoTokenCSRF(); ?>
             <BR>
 
             <div class="form_seleccion">
                 <label class="label1">Email</label>
-                <input type="email" class="formu-input" name="user" value="<?php echo $a['Email']; ?>" readonly>
+                <input type="email" class="formu-input" name="user" value="<?php echo htmlspecialchars($a['Email']); ?>" readonly>
             </div>
             <BR>
 
 
             <div class="form_seleccion">
                 <label class="label1">Nombre </label>
-                <input type="text" class="formu-input" name="nombre" value="<?php echo $a['Nombre']; ?>" required>
+                <input type="text" class="formu-input" name="nombre" value="<?php echo htmlspecialchars($a['Nombre']); ?>" required>
             </div>
             <BR>
 
             <div class="form_seleccion">
                 <label class="label1">Codigo </label>
-                <input type="text" class="formu-input" name="cc" value="<?php echo $a['cc']; ?>" required>
+                <input type="text" class="formu-input" name="cc" value="<?php echo htmlspecialchars($a['cc']); ?>" required>
             </div>
             <BR>
 
             <div class="form_seleccion">
-                <label class="label1">Foto Actual <?php echo $a['Foto']; ?> </label><BR>
+                <label class="label1">Foto Actual <?php echo htmlspecialchars($a['Foto']); ?> </label><BR>
                 <?php
-                echo "<img src ='archivos/" . $_SESSION['user'] . "" . $a['Foto'] . "'width=30% > ";
+                echo "<img src ='archivos/" . htmlspecialchars($_SESSION['user']) . "" . htmlspecialchars($a['Foto']) . "'width=30% > ";
                 ?>
-                <input type="file" class="formu-input" name="photo" value="<?php echo $a['Foto']; ?>">
+                <input type="file" class="formu-input" name="photo">
             </div>
 
-            <input type="hidden" class="formu-input" name="tipo" value="<?php echo $a['Tipo']; ?>">
-            <input type="hidden" class="formu-input" name="fotoa" value="<?php echo $a['Foto']; ?>">
+            <input type="hidden" class="formu-input" name="tipo" value="<?php echo htmlspecialchars($a['Tipo']); ?>">
+            <input type="hidden" class="formu-input" name="fotoa" value="<?php echo htmlspecialchars($a['Foto']); ?>">
             <br>
             <div class="form_seleccion">
                 <label class="label1">Banner </label>
                 <br>
-                <label class="label1">Banner Actual <?php echo $a['Foto']; ?> </label><BR>
+                <label class="label1">Banner Actual <?php echo htmlspecialchars($a['Foto']); ?> </label><BR>
                 <?php
-                echo "<img src ='" . $a['baner'] . "'width=30% > ";
+                echo "<img src ='" . htmlspecialchars($a['baner']) . "'width=30% > ";
                 ?>
-                <input type="text" class="formu-input" name="baner" value="<?php echo $a['baner']; ?>" required>
+                <input type="text" class="formu-input" name="baner" value="<?php echo htmlspecialchars($a['baner']); ?>" required>
             </div>
             <BR>
 

@@ -1,6 +1,7 @@
 <?php
 include('includes/conectar.php');
 include('includes/secionesUser.php');
+require_once('includes/upload_security.php');
 
 if (!isset($_SESSION['clave'])) {
     header("Location: error.php");
@@ -12,130 +13,110 @@ if (isset($_REQUEST['cerrar'])) {
 }
 
 if (isset($_REQUEST['subir']) && !empty($_REQUEST['subir'])) {
+    // Validar token CSRF
+    if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
+        header("Location: errors/errorlogin.php");
+        exit();
+    }
+    
     $clave = $_SESSION['clave'];
     $usuario = $_SESSION['user'];
-    $namefile = $_FILES['archivo']['name'];
-    $tipo = $_FILES['archivo']['type'];
+    
+    // Validar archivo subido
+    $uploadArchivo = validarArchivo($_FILES['archivo'], ['pdf', 'doc', 'docx', 'txt', 'xls', 'xlsx', 'ppt', 'pptx'], 10485760);
+    
+    if (!$uploadArchivo['success']) {
+        header("Location: errors/errorlogin.php");
+        exit();
+    }
+    
+    $namefile = $uploadArchivo['nombre_seguro'];
+    $tipo = $uploadArchivo['mime'];
     $tamanio = $_FILES['archivo']['size'];
 
-    $resultado = mysqli_query($cont, "SELECT * FROM archivos WHERE nombre ='" . $namefile . "'");
+    // Verificar si ya existe con prepared statement
+    $stmt_check = $cont->prepare("SELECT idarchivos FROM archivos WHERE nombre = ?");
+    $stmt_check->bind_param("s", $namefile);
+    $stmt_check->execute();
+    $resultado = $stmt_check->get_result();
+    
     if (mysqli_num_rows($resultado) == 1) {
-
         echo '<script type="text/javascript">
         alert("El Documento ya Existe, Por favor Cambie el Nombre del Documento y Vuelva a Cargarlo ");
         window.location.href="archivos.php";
         </script>';
     } else {
-
-        mysqli_query($cont, "INSERT INTO archivos VALUE (NULL,'$namefile','$tipo','$tamanio','$clave','$usuario')");
-        $sql = "SELECT * FROM archivos WHERE nombre ='" . $namefile . "'";
-        $resultad = mysqli_query($cont, $sql);
-        $as = mysqli_fetch_assoc($resultad);
-        $idar = $as['idarchivos'];
+        $stmt_insert = $cont->prepare("INSERT INTO archivos VALUE (NULL, ?, ?, ?, ?, ?)");
+        $stmt_insert->bind_param("ssiss", $namefile, $tipo, $tamanio, $clave, $usuario);
+        $stmt_insert->execute();
+        
+        // Obtener ID insertado
+        $idar = mysqli_insert_id($cont);
+        
         move_uploaded_file($_FILES['archivo']['tmp_name'], "archivos/archivosClases/" . $idar . $namefile);
+        header("location:archivos.php");
+        
+        $stmt_insert->close();
+    }
+    $stmt_check->close();
+}
+
+// Consulta de archivos
+$stmt_archivos = $cont->prepare("SELECT * FROM archivos WHERE clave = ?");
+$stmt_archivos->bind_param("s", $_SESSION['clave']);
+$stmt_archivos->execute();
+$qarchivos = $stmt_archivos->get_result();
+$numArchivos = mysqli_num_rows($qarchivos);
+$archivosbase = mysqli_fetch_assoc($qarchivos);
+$stmt_archivos->close();
+
+// Consulta de clase
+$stmt_clase = $cont->prepare("SELECT * FROM clase WHERE clave = ?");
+$stmt_clase->bind_param("s", $_SESSION['clave']);
+$stmt_clase->execute();
+$resultado1 = $stmt_clase->get_result();
+$n1 = mysqli_num_rows($resultado1);
+$a1 = mysqli_fetch_assoc($resultado1);
+$stmt_clase->close();
+
+if (isset($_REQUEST['e'])) {
+    // Validar que sea docente antes de eliminar
+    $stmt_tipo = $cont->prepare("SELECT Tipo FROM usuarios WHERE Email = ?");
+    $stmt_tipo->bind_param("s", $_SESSION['user']);
+    $stmt_tipo->execute();
+    $tipoUsuario = mysqli_fetch_assoc($stmt_tipo->get_result());
+    $stmt_tipo->close();
+    
+    if ($tipoUsuario['Tipo'] == 'Docente') {
+        $idEliminar = intval($_REQUEST['e']);
+        
+        $stmt_file = $cont->prepare("SELECT idarchivos, nombre FROM archivos WHERE idarchivos = ?");
+        $stmt_file->bind_param("i", $idEliminar);
+        $stmt_file->execute();
+        $as = mysqli_fetch_assoc($stmt_file->get_result());
+        $stmt_file->close();
+        
+        if ($as) {
+            $name = 'archivos/archivosClases/' . $as['idarchivos'] . $as['nombre'];
+            if (file_exists($name)) {
+                unlink($name);
+            }
+            
+            $stmt_delete = $cont->prepare("DELETE FROM archivos WHERE idarchivos = ?");
+            $stmt_delete->bind_param("i", $idEliminar);
+            $stmt_delete->execute();
+            $stmt_delete->close();
+        }
         header("location:archivos.php");
     }
 }
-$qarchivos = mysqli_query($cont, "SELECT *FROM archivos WHERE clave='" . $_SESSION['clave'] . "'");
-$numArchivos = mysqli_num_rows($qarchivos);
-$archivosbase = mysqli_fetch_assoc($qarchivos);
 
-
-$sql = ("SELECT* FROM clase WHERE clave='" . $_SESSION['clave'] . "'");
-$resultado1 = mysqli_query($cont, $sql);
-$n1 = mysqli_num_rows($resultado1);
-$a1 = mysqli_fetch_assoc($resultado1);
-
-
-if (isset($_REQUEST['e'])) {
-
-    $as = mysqli_fetch_assoc(mysqli_query($cont, "SELECT * FROM archivos WHERE idarchivos='" . $_REQUEST['e'] . "'"));
-    $name = 'archivos/archivosClases/' . $as['idarchivos'] . $as['nombre'];
-    unlink($name);
-
-    mysqli_query($cont, "DELETE FROM archivos WHERE idarchivos=" . $_REQUEST['e']);
-    header("location:archivos.php");
-}
-$atipo = mysqli_fetch_assoc(mysqli_query($cont, "SELECT * FROM usuarios WHERE Email ='" . $_SESSION['user'] . "'"));
+// Obtener tipo de usuario
+$stmt_usuario = $cont->prepare("SELECT Tipo FROM usuarios WHERE Email = ?");
+$stmt_usuario->bind_param("s", $_SESSION['user']);
+$stmt_usuario->execute();
+$atipo = mysqli_fetch_assoc($stmt_usuario->get_result());
+$stmt_usuario->close();
 
 include('includes/encabezado.php')
-?>
-
-
-<body>
-    <?php
-    include('includes/header.php');
-    ?>
-    <?php
-    echo ("<h1 > "  . $a1['nombre'] . "</h1><br>");
-
-    ?>
-    <hr>
-
-    <h1 style="margin-bottom: -50px;">Guia de Actividades</h1>
-    <div class="menu">
-        <h1><?php include('includes/menu.php') ?></h1>
-    </div>
-    <div class="tabla">
-        <?php
-        if ($atipo['Tipo'] == 'Docente') { ?>
-            <form action="archivos.php" enctype="multipart/form-data" method="post" autocomplete="off" class="formu" style="margin-top: -50px;">
-                <label style="font-size: 25px;color:aliceblue;" for="archivo">Subir Archivo</label>
-                <input class="formu-input" type="file" name="archivo" placeholder="" required> <br>
-                <input type="hidden" name="subir" value="ok">
-                <input class="formu-button" type="submit" value="Subir Archivo">
-            </form>
-        <?php
-        } ?>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Nombre</th>
-                    <th>Tamaño</th>
-                    <?php if ($atipo['Tipo'] == 'Docente') {
-                        echo "<th>Eliminar</th>";
-                    } ?>
-                    <th>Descargar</th>
-
-                </tr>
-            </thead>
-
-            <?php
-            if ($numArchivos > 0) {
-                do {
-                    echo "<tr>";
-                    echo "<td>" . $archivosbase['idarchivos'] . "</td>";
-                    echo "<td>" . $archivosbase['nombre'] . "</td>";
-                    echo "<td>" . $archivosbase['tamanio'] . "</td>";
-                    if ($atipo['Tipo'] == 'Docente') {
-                        echo "<td><a href='archivos.php?e=" . $archivosbase['idarchivos'] . "'>Eliminar</a></td>";
-                    }
-                    echo "<td><a href='archivos/archivosClases/" . $archivosbase['idarchivos'] . $archivosbase['nombre'] . "'>Descargas</a></td>";
-                    echo "</tr>";
-                } while ($archivosbase = mysqli_fetch_assoc($qarchivos));
-            } else {
-                echo "<tr>";
-                echo "<td>No hay archivos</td>";
-                echo "</tr>";
-            }
-
-            ?>
-
-            </script>
-        </table>
-    </div>
-
-
-</body>
-
-</html>
-<?php
-
-mysqli_free_result($resultad);
-mysqli_free_result($resultado1);
-mysqli_free_result($qarchivos);
-mysqli_close($cont);
-
 ?>
