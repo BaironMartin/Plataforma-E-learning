@@ -10,13 +10,26 @@ generarTokenCSRF();
 
 if (isset($_SESSION['user'])) {
     header("Location: inicio.php");
+    exit;
 }
 
-if (isset($_REQUEST['u']) && !empty($_REQUEST['u'])) {
-    $u = $_POST['u'];
-    $p = $_POST['p'];
+// Manejar login
+if (isset($_POST['u']) && !empty($_POST['u'])) {
+    // Validar token CSRF primero
+    if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
+        header("Location: Errors/errorlogin.php");
+        exit;
+    }
     
-    $clave = $_POST['g-recaptcha-response'];
+    $u = $_POST['u'] ?? '';
+    $p = $_POST['p'] ?? '';
+    
+    if (empty($u) || empty($p)) {
+        header("Location: Errors/errorlogin.php");
+        exit;
+    }
+    
+    $clave = $_POST['g-recaptcha-response'] ?? '';
     $secret = getenv('RECAPTCHA_SECRET_KEY') ?: '6LcRjHskAAAAABA0ioTMxTx7GwBSq8PfKKZBQcTo';
 
     if (!$clave) {
@@ -36,23 +49,34 @@ if (isset($_REQUEST['u']) && !empty($_REQUEST['u'])) {
     }
 }
 
-
-if (isset($_REQUEST['user']) && !empty($_REQUEST['user'])) {
+// Manejar registro
+if (isset($_POST['user']) && !empty($_POST['user'])) {
     // Validar token CSRF
     if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
         header("Location: Errors/errorlogin.php");
         exit;
     }
     
-    $u = $_REQUEST['user'];
-    $p = $_REQUEST['pass'];
-    $n = $_REQUEST['nombre'];
-    $cc = $_REQUEST['cc'];
-    $f = $_FILES['photo']['name'];
-    $t = $_REQUEST['tipo'];
-    $g = $_REQUEST['grado'];
+    $u = $_POST['user'] ?? '';
+    $p = $_POST['pass'] ?? '';
+    $n = $_POST['nombre'] ?? '';
+    $cc = $_POST['cc'] ?? '';
+    $t = $_POST['tipo'] ?? '';
+    $g = $_POST['grado'] ?? '';
+    
+    // Validar campos requeridos
+    if (empty($u) || empty($p) || empty($n) || empty($cc) || empty($t)) {
+        header("Location: Errors/errorlogin.php");
+        exit;
+    }
+    
+    // Validar tipo de usuario
+    if (!in_array($t, ['Docente', 'Estudiante'])) {
+        header("Location: Errors/errorlogin.php");
+        exit;
+    }
 
-    registrer_Index($u, $p, $n, $cc, $f, $t, $g);
+    registrer_Index($u, $p, $n, $cc, $t, $g);
     exit;
 }
 
@@ -90,25 +114,25 @@ include('includes/encabezado.php')
                     <input type="password" name="p" id="" placeholder="Contraseña" required>
                     <br><br>
                     <div class="g-recaptcha" data-sitekey="<?php echo getenv('RECAPTCHA_SITE_KEY') ?: '6LcRjHskAAAAAEwUuhbrMYUDI4W2am3GtMfrr4dh'; ?>"></div>
-                    <button>Entrar</button>
+                    <button type="submit">Entrar</button>
                     <br><a href="restaurarPasword.php">Olvide mi Password</a>
                 </form>
                 <form action="index.php" method="post" enctype="multipart/form-data" class="formulario_register">
                     <h2>Regístrarse</h2>
                     <?php echo campoTokenCSRF(); ?>
-                    <input type="email" name="user" id="" placeholder="Correo Electronico">
-                    <input type="password" name="pass" id="" placeholder="Contraseña">
-                    <input type="text" name="nombre" id="" placeholder="Nombre Completo">
-                    <input type="number" name="cc" id="" placeholder="Documento de identidad">
-                    <input type="file" name="photo" id="" placeholder="Imagen" require><br><br>
-                    <select name='tipo' id="tipo">
-                        <option value=""></option>
+                    <input type="email" name="user" id="" placeholder="Correo Electronico" required>
+                    <input type="password" name="pass" id="" placeholder="Contraseña" required>
+                    <input type="text" name="nombre" id="" placeholder="Nombre Completo" required>
+                    <input type="number" name="cc" id="" placeholder="Documento de identidad" required>
+                    <input type="file" name="photo" id="" accept="image/*" required><br><br>
+                    <select name='tipo' id="tipo" required>
+                        <option value="">Seleccione un tipo</option>
                         <option value="Docente">Docente</option>
                         <option value="Estudiante">Estudiante</option>
                     </select>
                     <br>
                     <select name='grado' id="grado">
-                        <option value=""></option>
+                        <option value="">Seleccione un grado</option>
                         <option value="Prescolar">Prescolar</option>
                         <option value="primero">primero</option>
                         <option value="segundo">segundo</option>
@@ -125,7 +149,7 @@ include('includes/encabezado.php')
                     </select>
                     <label>En caso de ser docente seleccionar no aplica</label>
                     <br>
-                    <button>Registrar</button>
+                    <button type="submit">Registrar</button>
                 </form>
             </div>
         </div>
