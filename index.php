@@ -1,8 +1,13 @@
 <?php
 include('includes/conectar.php');
 include('function/funciones.php');
+include('includes/csrf.php');
 
 session_start();
+
+// Regenerar token CSRF en cada sesión
+generarTokenCSRF();
+
 if (isset($_SESSION['user'])) {
     header("Location: inicio.php");
 }
@@ -10,24 +15,35 @@ if (isset($_SESSION['user'])) {
 if (isset($_REQUEST['u']) && !empty($_REQUEST['u'])) {
     $u = $_POST['u'];
     $p = $_POST['p'];
-    echo $u,$p;
+    
     $clave = $_POST['g-recaptcha-response'];
-    $secret = '6LcRjHskAAAAABA0ioTMxTx7GwBSq8PfKKZBQcTo';
+    $secret = getenv('RECAPTCHA_SECRET_KEY') ?: '6LcRjHskAAAAABA0ioTMxTx7GwBSq8PfKKZBQcTo';
 
     if (!$clave) {
-        header("Location: errors/errorlogin.php");
+        header("Location: Errors/errorlogin.php");
+        exit;
     }
 
     $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$secret&response=$clave");
     $arr = json_decode($response, true);
+    
     if ($arr['success']) {
         login_Index($u, $p);
+        exit;
     } else {
+        header("Location: Errors/errorlogin.php");
+        exit;
     }
 }
 
 
 if (isset($_REQUEST['user']) && !empty($_REQUEST['user'])) {
+    // Validar token CSRF
+    if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
+        header("Location: Errors/errorlogin.php");
+        exit;
+    }
+    
     $u = $_REQUEST['user'];
     $p = $_REQUEST['pass'];
     $n = $_REQUEST['nombre'];
@@ -36,7 +52,8 @@ if (isset($_REQUEST['user']) && !empty($_REQUEST['user'])) {
     $t = $_REQUEST['tipo'];
     $g = $_REQUEST['grado'];
 
-    registrer_Index($u, $p, $n, $cc, $f, $t,$g);
+    registrer_Index($u, $p, $n, $cc, $f, $t, $g);
+    exit;
 }
 
 include('includes/encabezado.php')
@@ -68,15 +85,17 @@ include('includes/encabezado.php')
             <div class="contenedor_login_register">
                 <form action="index.php" method="post" class="formulario_login" autocomplete="off">
                     <h2>Iniciar Sesión</h2>
+                    <?php echo campoTokenCSRF(); ?>
                     <input type="email" name="u" id="" placeholder="Correo Electronico" required>
                     <input type="password" name="p" id="" placeholder="Contraseña" required>
                     <br><br>
-                    <div class="g-recaptcha" data-sitekey="6LcRjHskAAAAAEwUuhbrMYUDI4W2am3GtMfrr4dh"></div>
+                    <div class="g-recaptcha" data-sitekey="<?php echo getenv('RECAPTCHA_SITE_KEY') ?: '6LcRjHskAAAAAEwUuhbrMYUDI4W2am3GtMfrr4dh'; ?>"></div>
                     <button>Entrar</button>
                     <br><a href="restaurarPasword.php">Olvide mi Password</a>
                 </form>
                 <form action="index.php" method="post" enctype="multipart/form-data" class="formulario_register">
                     <h2>Regístrarse</h2>
+                    <?php echo campoTokenCSRF(); ?>
                     <input type="email" name="user" id="" placeholder="Correo Electronico">
                     <input type="password" name="pass" id="" placeholder="Contraseña">
                     <input type="text" name="nombre" id="" placeholder="Nombre Completo">

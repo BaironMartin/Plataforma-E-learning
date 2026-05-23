@@ -1,6 +1,7 @@
 <?php
 include('includes/conectar.php');
 include('includes/secionesUser.php');
+include('includes/csrf.php');
 
 if (isset($_REQUEST['cerrar'])) {
     session_destroy();
@@ -21,23 +22,42 @@ function generaPass()
     return $pass;
 }
 
-if (isset($_REQUEST['clase'])) {
-    $name = $_REQUEST['clase'];
-    $imagen = $_REQUEST['imagen'];
+if (isset($_POST['clase']) && isset($_POST['imagen']) && isset($_POST['grado'])) {
+    // Validar token CSRF
+    if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
+        die("Token CSRF inválido");
+    }
+    
+    $name = trim($_POST['clase']);
+    $imagen = trim($_POST['imagen']);
+    $gra = $_POST['grado'];
     $clave = generaPass();
     $u = $_SESSION['user'];
-    $gra=$_REQUEST['grado'];
-    $sql1 = ("INSERT INTO clase VALUES(NULL,'$name','$clave','$u',NULL,'$imagen','$gra')");
-    mysqli_query($cont, $sql1);
+    
+    // Validaciones básicas
+    if (empty($name) || empty($imagen) || empty($gra)) {
+        die("Todos los campos son requeridos");
+    }
+    
+    // Prepared statement para INSERT
+    $stmt = $cont->prepare("INSERT INTO clase VALUES(NULL, ?, ?, ?, NULL, ?, ?)");
+    $stmt->bind_param("sssss", $name, $clave, $u, $imagen, $gra);
+    $stmt->execute();
+    $stmt->close();
+    
     header("location:crearClase.php");
+    exit();
 }
 
 
 
-$sql = ("SELECT* FROM clase WHERE usuario='" . $_SESSION['user'] . "'");
-$resultado = mysqli_query($cont, $sql);
-$n = mysqli_num_rows($resultado);
-$a = mysqli_fetch_assoc($resultado);
+// Prepared statement para consultar clases
+$stmt = $cont->prepare("SELECT * FROM clase WHERE usuario = ?");
+$stmt->bind_param("s", $_SESSION['user']);
+$stmt->execute();
+$resultado = $stmt->get_result();
+$n = $resultado->num_rows;
+$a = $resultado->fetch_assoc();
 
 include('includes/encabezado.php')
 
@@ -67,9 +87,10 @@ include('includes/encabezado.php')
     <h1>Gestionar Clases</h1>
 
     <form action="crearClase.php" method="post" autocomplete="off" class="formu">
+        <?php echo campoTokenCSRF(); ?>
         <input class="formu-input" type="text" name="clase" placeholder="Nombre de Clase" required>
-        <input class="formu-input" type="text" name="imagen" placeholder="enlace de la imagen" required>
-        <select class="formu-input" name='grado' id="grado">
+        <input class="formu-input" type="url" name="imagen" placeholder="enlace de la imagen" required>
+        <select class="formu-input" name='grado' id="grado" required>
             <option style="color:white;" value="">grado</option>
             <option value="Prescolar">Prescolar</option>
             <option value="primero">primero</option>
@@ -96,21 +117,21 @@ include('includes/encabezado.php')
 
         if ($n > 0) {
             do {
-
                 $name = $a['nombre'];
                 echo "<div class='product-container'>";
-                echo "<h3>" . substr($name, 0, 20), '...' . "</h3><br>";
-                echo "<img src='" . $a['imagen'] . "' />";
+                echo "<h3>" . htmlspecialchars(substr($name, 0, 20)) . '...' . "</h3><br>";
+                echo "<img src='" . htmlspecialchars($a['imagen']) . "' />";
                 echo "<div class='container2'>";
-                echo "<p>Clave Unica: " . $a['clave']  . "</p><br>";
-                echo "<p>Grado: " . $a['grado']  . "</p><br>";
-                echo "<p>Fecha De Creacion: " . $a['fecha']  . "</p><br>";
+                echo "<p>Clave Unica: " . htmlspecialchars($a['clave']) . "</p><br>";
+                echo "<p>Grado: " . htmlspecialchars($a['grado']) . "</p><br>";
+                echo "<p>Fecha De Creacion: " . htmlspecialchars($a['fecha']) . "</p><br>";
 
-                echo "<button onclick= 'return confirmar()' ><a class='cerrar' href='eliminar_prod.php?e=" . $a['idclase'] . "'>Eliminar</a></button>";
-                echo "<button ><a class='editar' href='plan.php?clave=" . $a['clave'] . "'>Ver Plan</a></button>";
+                $csrf_token = generarTokenCSRF();
+                echo "<button onclick= 'return confirmar()' ><a class='cerrar' href='eliminar_prod.php?e=" . intval($a['idclase']) . "&csrf_token=" . $csrf_token . "'>Eliminar</a></button>";
+                echo "<button ><a class='editar' href='plan.php?clave=" . urlencode($a['clave']) . "'>Ver Plan</a></button>";
                 echo "</div><br>";
                 echo "</div>";
-            } while ($a = mysqli_fetch_assoc($resultado));
+            } while ($a = $resultado->fetch_assoc());
         } else {
             echo "<tr><td>No hay clases creadas</td></tr>";
         }
@@ -130,6 +151,6 @@ include('includes/encabezado.php')
 
 </html>
 <?php
-mysqli_free_result($resultado);
+$stmt->close();
 mysqli_close($cont);
 ?>
