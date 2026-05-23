@@ -17,7 +17,7 @@ if (isset($_SESSION['user'])) {
 if (isset($_POST['u']) && !empty($_POST['u'])) {
     // Validar token CSRF primero
     if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
-        header("Location: Errors/errorlogin.php");
+        header("Location: error_handler.php?t=captcha");
         exit;
     }
     
@@ -25,7 +25,7 @@ if (isset($_POST['u']) && !empty($_POST['u'])) {
     $p = $_POST['p'] ?? '';
     
     if (empty($u) || empty($p)) {
-        header("Location: Errors/errorlogin.php");
+        header("Location: error_handler.php?t=captcha");
         exit;
     }
     
@@ -33,7 +33,7 @@ if (isset($_POST['u']) && !empty($_POST['u'])) {
     $secret = getenv('RECAPTCHA_SECRET_KEY') ?: '6LcRjHskAAAAABA0ioTMxTx7GwBSq8PfKKZBQcTo';
 
     if (!$clave) {
-        header("Location: Errors/errorlogin.php");
+        header("Location: error_handler.php?t=captcha");
         exit;
     }
 
@@ -44,7 +44,7 @@ if (isset($_POST['u']) && !empty($_POST['u'])) {
         login_Index($u, $p);
         exit;
     } else {
-        header("Location: Errors/errorlogin.php");
+        header("Location: error_handler.php?t=captcha");
         exit;
     }
 }
@@ -53,7 +53,7 @@ if (isset($_POST['u']) && !empty($_POST['u'])) {
 if (isset($_POST['user']) && !empty($_POST['user'])) {
     // Validar token CSRF
     if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
-        header("Location: Errors/errorlogin.php");
+        header("Location: error_handler.php?t=captcha");
         exit;
     }
     
@@ -66,13 +66,13 @@ if (isset($_POST['user']) && !empty($_POST['user'])) {
     
     // Validar campos requeridos
     if (empty($u) || empty($p) || empty($n) || empty($cc) || empty($t)) {
-        header("Location: Errors/errorlogin.php");
+        header("Location: error_handler.php?t=captcha");
         exit;
     }
     
     // Validar tipo de usuario
     if (!in_array($t, ['Docente', 'Estudiante'])) {
-        header("Location: Errors/errorlogin.php");
+        header("Location: error_handler.php?t=captcha");
         exit;
     }
 

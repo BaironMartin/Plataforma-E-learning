@@ -53,11 +53,11 @@ if (isset($_REQUEST['rec'])) {
                 echo '<script language="javascript">alert("La contraseña no coincide");</script>';
             }
         } else {
-            header("Location:Errors/errorlogin5.php");
+            header("Location:error_handler.php?t=seguridad");
             exit;
         }
     } else {
-        header("Location:Errors/errorlogin4.php");
+        header("Location:error_handler.php?t=admin");
         exit;
     }
 }
