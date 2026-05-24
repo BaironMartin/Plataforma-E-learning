@@ -1,160 +1,122 @@
 <?php
-include('includes/conectar.php');
-include('function/funciones.php');
-include('includes/csrf.php');
-
 session_start();
 
-// Regenerar token CSRF en cada sesión
-generarTokenCSRF();
+// Configuración de base de datos
+$host = 'localhost';
+$db   = 'nombre_base_datos'; // CAMBIAR POR TU BD
+$user = 'root';              // CAMBIAR POR TU USUARIO
+$pass = '';                  // CAMBIAR POR TU CONTRASEÑA
+$charset = 'utf8mb4';
 
-if (isset($_SESSION['user'])) {
-    header("Location: inicio.php");
-    exit;
-}
+$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+];
 
-// Manejar login
-if (isset($_POST['u']) && !empty($_POST['u'])) {
-    // Validar token CSRF primero
-    if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
-        header("Location: error_handler.php?t=captcha");
-        exit;
-    }
-    
-    $u = $_POST['u'] ?? '';
-    $p = $_POST['p'] ?? '';
-    
-    if (empty($u) || empty($p)) {
-        header("Location: error_handler.php?t=captcha");
-        exit;
-    }
-    
-    $clave = $_POST['g-recaptcha-response'] ?? '';
-    $secret = getenv('RECAPTCHA_SECRET_KEY') ?: '6LcRjHskAAAAABA0ioTMxTx7GwBSq8PfKKZBQcTo';
+$error = '';
+$success = '';
 
-    if (!$clave) {
-        header("Location: error_handler.php?t=captcha");
-        exit;
-    }
+// Procesar Login
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $usuario = trim($_POST['usuario'] ?? '');
+    $password = $_POST['password'] ?? '';
 
-    $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$secret&response=$clave");
-    $arr = json_decode($response, true);
-    
-    if ($arr['success']) {
-        login_Index($u, $p);
-        exit;
+    if (empty($usuario) || empty($password)) {
+        $error = "Por favor ingrese usuario y contraseña.";
     } else {
-        header("Location: error_handler.php?t=captcha");
-        exit;
+        try {
+            $pdo = new PDO($dsn, $user, $pass, $options);
+            
+            // Buscar usuario (ajusta 'usuarios' y las columnas según tu BD real)
+            $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE usuario = ? OR email = ?");
+            $stmt->execute([$usuario, $usuario]);
+            $user = $stmt->fetch();
+
+            if ($user && password_verify($password, $user['password'])) {
+                // Login exitoso
+                $_SESSION['id'] = $user['id'];
+                $_SESSION['usuario'] = $user['usuario'];
+                $_SESSION['rol'] = $user['rol'] ?? 'user';
+                
+                // Redirigir según rol
+                if ($user['rol'] === 'admin') {
+                    header("Location: admin/dashboard.php");
+                } else {
+                    header("Location: dashboard.php");
+                }
+                exit;
+            } else {
+                $error = "Usuario o contraseña incorrectos.";
+            }
+        } catch (PDOException $e) {
+            $error = "Error de conexión: " . $e->getMessage();
+        }
     }
 }
 
-// Manejar registro
-if (isset($_POST['user']) && !empty($_POST['user'])) {
-    // Validar token CSRF
-    if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
-        header("Location: error_handler.php?t=captcha");
-        exit;
+// Si ya está logueado, redirigir
+if (isset($_SESSION['id'])) {
+    if (($_SESSION['rol'] ?? '') === 'admin') {
+        header("Location: admin/dashboard.php");
+    } else {
+        header("Location: dashboard.php");
     }
-    
-    $u = $_POST['user'] ?? '';
-    $p = $_POST['pass'] ?? '';
-    $n = $_POST['nombre'] ?? '';
-    $cc = $_POST['cc'] ?? '';
-    $t = $_POST['tipo'] ?? '';
-    $g = $_POST['grado'] ?? '';
-    
-    // Validar campos requeridos
-    if (empty($u) || empty($p) || empty($n) || empty($cc) || empty($t)) {
-        header("Location: error_handler.php?t=captcha");
-        exit;
-    }
-    
-    // Validar tipo de usuario
-    if (!in_array($t, ['Docente', 'Estudiante'])) {
-        header("Location: error_handler.php?t=captcha");
-        exit;
-    }
-
-    registrer_Index($u, $p, $n, $cc, $t, $g);
     exit;
 }
-
-include('includes/encabezado.php')
 ?>
-
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <style>
+        :root { --primary: #2563eb; --bg: #f3f4f6; --text: #1f2937; }
+        body { font-family: system-ui, sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; color: var(--text); }
+        .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { text-align: center; margin-bottom: 1.5rem; color: var(--primary); }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        input { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+        input:focus { outline: none; border-color: var(--primary); ring: 2px solid var(--primary); }
+        button { width: 100%; padding: 0.75rem; background: var(--primary); color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: #1d4ed8; }
+        .alert { padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem; }
+        .alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .alert-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .links { text-align: center; margin-top: 1rem; font-size: 0.9rem; }
+        .links a { color: var(--primary); text-decoration: none; }
+        .links a:hover { text-decoration: underline; }
+    </style>
+</head>
 <body>
-    <div class="pegajoso">
-        <img src="img/logo.png" alt="">
-        <h1><?php include('includes/name.php') ?></h1>
-    </div>
-    <br>
-    <main>
-        <div class="contenedor__todo">
-            <div class="caja_trasera">
-                <div class="caja_trasera_login">
-                    <h3>Ya tíenes una cuenta</h3>
-                    <p>Iniciar sesión para ingresar a la página</p>
-                    <button id="btn_iniciar_secion">Iniciar sesión </button>
-                </div>
-                <div class="caja_trasera_register">
-                    <h3>Aún no tíenes una cuenta</h3>
-                    <p>Regístrate para que puedas iniciar secion </p>
-                    <button id="btn_Register">Regístrarse </button>
-                </div>
-            </div>
+    <div class="container">
+        <h2>Bienvenido</h2>
+        
+        <?php if ($error): ?>
+            <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
+        <?php if ($success): ?>
+            <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+        <?php endif; ?>
 
-
-            <div class="contenedor_login_register">
-                <form action="index.php" method="post" class="formulario_login" autocomplete="off">
-                    <h2>Iniciar Sesión</h2>
-                    <?php echo campoTokenCSRF(); ?>
-                    <input type="email" name="u" id="" placeholder="Correo Electronico" required>
-                    <input type="password" name="p" id="" placeholder="Contraseña" required>
-                    <br><br>
-                    <div class="g-recaptcha" data-sitekey="<?php echo getenv('RECAPTCHA_SITE_KEY') ?: '6LcRjHskAAAAAEwUuhbrMYUDI4W2am3GtMfrr4dh'; ?>"></div>
-                    <button type="submit">Entrar</button>
-                    <br><a href="restaurarPasword.php">Olvide mi Password</a>
-                </form>
-                <form action="index.php" method="post" enctype="multipart/form-data" class="formulario_register">
-                    <h2>Regístrarse</h2>
-                    <?php echo campoTokenCSRF(); ?>
-                    <input type="email" name="user" id="" placeholder="Correo Electronico" required>
-                    <input type="password" name="pass" id="" placeholder="Contraseña" required>
-                    <input type="text" name="nombre" id="" placeholder="Nombre Completo" required>
-                    <input type="number" name="cc" id="" placeholder="Documento de identidad" required>
-                    <input type="file" name="photo" id="" accept="image/*" required><br><br>
-                    <select name='tipo' id="tipo" required>
-                        <option value="">Seleccione un tipo</option>
-                        <option value="Docente">Docente</option>
-                        <option value="Estudiante">Estudiante</option>
-                    </select>
-                    <br>
-                    <select name='grado' id="grado">
-                        <option value="">Seleccione un grado</option>
-                        <option value="Prescolar">Prescolar</option>
-                        <option value="primero">primero</option>
-                        <option value="segundo">segundo</option>
-                        <option value="tercero">tercero</option>
-                        <option value="cuarto">cuarto</option>
-                        <option value="quinto">quinto</option>
-                        <option value="sexto">sexto</option>
-                        <option value="septimo">septimo</option>
-                        <option value="octavo">octavo</option>
-                        <option value="noveno">noveno</option>
-                        <option value="decimo">decimo</option>
-                        <option value="undecimo">undecimo</option>
-                        <option value="noaplica">No aplica</option>
-                    </select>
-                    <label>En caso de ser docente seleccionar no aplica</label>
-                    <br>
-                    <button type="submit">Registrar</button>
-                </form>
+        <form method="POST" action="">
+            <div class="form-group">
+                <label for="usuario">Usuario o Email</label>
+                <input type="text" id="usuario" name="usuario" required placeholder="Ingresa tu usuario">
             </div>
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" name="password" required placeholder="••••••••">
+            </div>
+            <button type="submit">Ingresar</button>
+        </form>
+
+        <div class="links">
+            ¿No tienes cuenta? <a href="registro.php">Regístrate aquí</a>
         </div>
-    </main>
-    <script src="js/script.js"></script>
+    </div>
 </body>
-
 </html>
